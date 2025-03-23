@@ -1,6 +1,5 @@
 /*******************************************************************************************************************
- * Objective of the program:  Make the internal LED of the board throw an SOS morse code signal every time the USER
- button is pressed.
+ * Objective of the program:  Make an external LED throw an SOS morse code signal every time the USER button is pressed.
  *******************************************************************************************************************
  * Author: Luciano Carricart, https://github.com/lcarricart/
  * Status: Information Engineering student at HAW Hamburg, Germany.
