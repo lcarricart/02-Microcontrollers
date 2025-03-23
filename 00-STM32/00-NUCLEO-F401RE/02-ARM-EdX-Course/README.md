@@ -1,4 +1,4 @@
-﻿## Environment Characteristics
+﻿# Environment Characteristics
 The board being used is an STM32 NUCLEO-F401RE run with Mbed OS6.
 
 ## How to make run this files in your microcontroller
