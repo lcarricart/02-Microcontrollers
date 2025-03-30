@@ -50,7 +50,7 @@ int main() {
         int8_t y = joystickY.read() * 100;
 
         // **New Code. Part 3/3. Print the joystick coordinates to the LCD
-        write_cmd(0xc0); // Set cursor to second line (0x00 + 0x08)
+        write_cmd(0xc0); // Set cursor to second line (1st = 0x80, 2nd = 0xc0, 3rd = 0x94, 4th = 0xD4).
         print_lcd("  Position: X = ");
 
         /* Now we have a problem because we wanna pass an integer but our function is built for strings. I can overload the functions (but they´re a chain of them),
