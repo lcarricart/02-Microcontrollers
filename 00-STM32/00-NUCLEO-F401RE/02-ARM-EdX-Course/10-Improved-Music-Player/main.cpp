@@ -1,7 +1,7 @@
 /*******************************************************************************************************************
- * Objective of the program: Using "Music-Player" project as the base, I modified the code to select songs through
- an Arrows & OK mechanism, giving the user the posibility to browse through songs instead of having to press complex
- button combinations. The program works underl flags-based thread synchronization.
+ * Objective of the program: Using "Flags-Based-Thread-Control" project as the base, I modified the code to select 
+ songs through an UP / DOWN / OK mechanism, giving the user the posibility to browse through songs instead of having 
+ to press complex button combinations. The program works underl flags-based thread synchronization.
  *******************************************************************************************************************
  Learning outcome: I realize that RTOS programming isn't just like any other program flow. There are different
  strategies to control the flow safely, and the one imnplemented here is flag-based (or state-variable) thread
@@ -12,17 +12,20 @@
  * Profile: https://www.linkedin.com/in/lucianocarricart/
  *******************************************************************************************************************/
 
+// Preprocessor directives
 #include "mbed.h"
 #include "tunes.h"
 #include "4bit_LCD.h"
 
-PwmOut speaker(D3);         // for piezo sounder
+// Object declarations
+PwmOut speaker(D3);           // for piezo sounder
 AnalogIn volume(A0);          // for potentiometer
 InterruptIn go(D7);           // button: move to the next menu
 InterruptIn arrow_down(D6);   // button: arrow down
 InterruptIn ok(D5);           // button: OK, select song
 InterruptIn arrow_up(D4);     // button: arrow up
 
+// Mutual Exclusive for shared LCD
 Mutex lcd_mutex;
 
 // These flags indicate state of player
@@ -36,13 +39,15 @@ int cursor = 1;
 int ok_button = 0;
 int next_menu = 0;
 
+// Prototypes
 void LCD_cont(void);
 void Tune_select(void);
 void Play_tune(void);
 
 //-------------- Threads ----------------//
 
-Thread thread1;   // Displays welcome message on LCD
+// Displays welcome message on LCD
+Thread thread1;
 void LCD_cont() {
     init_lcd();  // initialise the LCD
 
@@ -63,6 +68,7 @@ void LCD_cont() {
     } // end of while(1)
 }
 
+// Displays the Song-selection menu
 Thread thread_songs_menu;
 void Tune_menu()
 {
@@ -93,14 +99,15 @@ void Tune_menu()
             write_cmd(0xD4);
             print_lcd("Status: Choosing...");
             lcd_mutex.unlock();
-            thread_sleep_for(500);
+            thread_sleep_for(100);
 
             next_menu = 0;  // Turn off song selection menu variable to avoid infinite displays of the menu.
         }
     }
 }
 
-Thread thread2;   // Reads the select buttons and readies the song
+// Reads the select buttons and prepares the song
+Thread thread2;
 void Tune_select() {
     while (1) {
         if (ok_button) { // "triggered" is set by Interrupt
@@ -131,7 +138,8 @@ void Tune_select() {
     } // end of while(1)
 }
 
-Thread thread3;   // plays the chosen tune
+// Plays the chosen tune
+Thread thread3;
 void Play_tune() {
     while (1) {
         if (playing) {
@@ -159,11 +167,14 @@ void Play_tune() {
 }
 
 /*-------------- Handlers ---------------*/
-void go_handler() { // responds to press of Play button, and sets "triggered"
+
+// Responds to press of GO button, and sets "next_menu"
+void go_handler() {
     if (playing == 0) // only set "triggered" if song not playing
         next_menu = 1;
 }
 
+// Responds to press of DOWN button
 void down_handler()
 {
     if (playing == 0)
@@ -174,6 +185,7 @@ void down_handler()
     }
 }
 
+// Responds to press of UP button
 void up_handler()
 {
     if (playing == 0)
@@ -184,6 +196,7 @@ void up_handler()
     }
 }
 
+// Responds to press of OK button
 void ok_handler()
 {
     if (playing == 0) ok_button = 1;
@@ -192,8 +205,8 @@ void ok_handler()
 //--------------- Main ------------------//
 int main() {
 
-    // Interrupts
-    go.fall(&go_handler);        // Int. when Play is pressed, ie on falling edge
+    // Falling edge interrupts for buttons
+    go.fall(&go_handler);      
     arrow_down.fall(&down_handler);
     ok.fall(&ok_handler);
     arrow_up.fall(&up_handler);
