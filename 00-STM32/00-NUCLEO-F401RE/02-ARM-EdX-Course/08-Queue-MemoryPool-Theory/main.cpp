@@ -11,13 +11,17 @@
  to avoid the pitfalls. Instead of dynamically allocating memory from the heap at runtime—which can lead to fragmentation,
  unpredictable allocation times, and potential failures—a memory pool preallocates a fixed block of memory that's divided
  into smaller, fixed-size chunks.
+
+ + To reduce the code size Mbed introduced Minimal printf and snprintf. As of Mbed OS 6.0 it is enabled by default. 
+ Floating point parameters are only present when minimal-printf-enable-floating-point config is set to true (disabled by 
+ default). I’m not sure but this could be the case when building with the online compiler. If your application requires 
+ more advanced functionality (at the cost of using more flash memory) you can switch to the standard printf library 
+ configuring it in mbed_app.json file by overriding the parameter target.printf_lib with the value std.
  *******************************************************************************************************************
  * Author: Luciano Carricart, https://github.com/lcarricart/
  * Status: Information Engineering student at HAW Hamburg, Germany.
  * Profile: https://www.linkedin.com/in/lucianocarricart/
  *******************************************************************************************************************/
-
- // To reduce the code size Mbed introduced Minimal printf and snprintf. As of Mbed OS 6.0 it is enabled by default. Floating point parameters are only present when minimal-printf-enable-floating-point config is set to true (disabled by default). I’m not sure but this could be the case when building with the online compiler. If your application requires more advanced functionality (at the cost of using more flash memory) you can switch to the standard printf library configuring it in mbed_app.json file by overriding the parameter target.printf_lib with the value std 
 
 #include "mbed.h"
 
