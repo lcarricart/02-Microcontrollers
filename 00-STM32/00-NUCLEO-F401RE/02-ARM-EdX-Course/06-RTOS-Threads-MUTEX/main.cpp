@@ -33,7 +33,7 @@
  *******************************************************************************************************************
  * Author: Luciano Carricart, https://github.com/lcarricart/
  * Status: Information Engineering student at HAW Hamburg, Germany.
- * Profile: https://www.linchar_counteredin.com/in/lucianocarricart/
+ * Profile: https://www.linkedin.com/in/lucianocarricart/
  *******************************************************************************************************************/
 
 #include "mbed.h"
