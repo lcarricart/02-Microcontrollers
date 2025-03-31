@@ -7,7 +7,7 @@
  * Profile: https://www.linkedin.com/in/lucianocarricart/
  *******************************************************************************************************************/
 
- // Preprocessor directives
+// Preprocessor directives
 #include "mbed.h"
 #include "tunes.h"
 #include <cstdio>
@@ -26,7 +26,7 @@ Mutex pc_screen_mutex;
 // These flags indicate state of player
 bool welcome = 1;   // Indicates welcome state
 bool waiting = 0;   // waiting for tune selection
-bool triggered = 0;    // tune is selected but hasn't started yet
+bool triggered = 0; // tune is selected but hasn't started yet
 bool playing = 0;   // tune is playing
 
 // Song selection mechanism
@@ -49,15 +49,15 @@ void pc_cont() {
     while (1) {
         if (welcome) {
             pc_screen_mutex.lock();
-            printf("\n\n\n\n"); // "Clears the screen"
+            printf("\n\n\n\n");
             printf("Your MUSIC Player!\n");
             printf("Press GO to continue\n");
             printf("Status: Ready\n");
             pc_screen_mutex.unlock();
             thread_sleep_for(500);
             welcome = 0;
-        } // end of if
-    } // end of while(1)
+        }
+    } 
 }
 
 // Displays the Song-selection menu
@@ -70,7 +70,7 @@ void Tune_menu()
         if (next_menu == 1)
         {
             pc_screen_mutex.lock();
-            printf("\n\n\n\n"); // "Clears the screen"
+            printf("\n\n\n\n");
             printf("Select a song:\n");
 
             switch (cursor)
@@ -92,7 +92,7 @@ void Tune_menu()
             pc_screen_mutex.unlock();
             thread_sleep_for(500);
 
-            next_menu = 0;  // Turn off song selection menu variable to avoid infinite displays of the menu.
+            next_menu = 0;  // Turn off song selection menu variable to avoid infinite displays of the menu (flags flow control)
         }
     }
 }
@@ -101,7 +101,7 @@ void Tune_menu()
 Thread thread2;
 void Tune_select() {
     while (1) {
-        if (ok_button) { // "triggered" is set by Interrupt
+        if (ok_button) { // "ok_button" is set by Interrupt
             switch (cursor) { // read song selection and load song pointer
             case 1: song_ptr = &Oranges; break;
             case 2: song_ptr = &Cielito; break;
@@ -112,10 +112,10 @@ void Tune_select() {
             case 7: song_ptr = &Matilda; break;
             case 8: song_ptr = &Alouetta; break;
             case 9: song_ptr = &Twinkle; break;
-            } // end of switch
+            }
 
             pc_screen_mutex.lock();
-            printf("\n\n\n\n"); // "Clears the screen"
+            printf("\n\n\n\n");
             printf("Now playing:\n");
             printf("%s \n", song_ptr->name); // display song name
             printf("Status: Playing!!\n");
@@ -123,8 +123,8 @@ void Tune_select() {
 
             ok_button = 0;
             playing = 1;
-        } // end of if
-    } // end of while(1)
+        } 
+    }
 }
 
 // Plays the chosen tune
@@ -132,7 +132,7 @@ Thread thread3;
 void Play_tune() {
     while (1) {
         if (playing) {
-            // resume PWM operation, stopped after last song
+            // Resume PWM operation, stopped after last song
             speaker.resume();
             for (int i = 0; i <= (song_ptr->length); i++) {
                 speaker.period(1 / (2 * (*song_ptr).freq[i])); // set PWM period
@@ -141,7 +141,7 @@ void Play_tune() {
             }
             speaker = 0; // To shut the sound, volume = 0;
 
-            // indicate end of song
+            // Indicate end of song
             pc_screen_mutex.lock();
             printf("\n\n\n\n"); // "Clears the screen"
             printf("Status: Waiting...\n");
@@ -151,15 +151,15 @@ void Play_tune() {
             playing = false;
             welcome = 1;
             speaker.suspend();
-        } // end of if
-    } // end of while(1)
+        } 
+    } 
 }
 
 /*-------------- Handlers ---------------*/
 
 // Responds to press of GO button, and sets "next_menu"
 void go_handler() {
-    if (playing == 0) // only set "triggered" if song not playing
+    if (playing == 0)       // Only set "next_menu" if song not playing
         next_menu = 1;
 }
 
@@ -207,6 +207,6 @@ int main() {
     thread3.start(callback(Play_tune));
 
     while (1) {
-        __WFI(); // wait for interrupt
+        __WFI(); // Wait For Interrupt
     }
 }
