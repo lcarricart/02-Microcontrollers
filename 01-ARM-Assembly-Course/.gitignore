@@ -1,0 +1,33 @@
+# Keil uVision5 specific
+*.axf
+*.bak
+*.d
+*.dep
+*.htm
+*.lst
+*.map
+*.plg
+*.uvguix.*
+*.uvoptx
+*.uvprojx
+*.uvopt
+
+# Keil uVision5 output directories
+Listings/
+Objects/
+DebugConfig/
+RTE/
+.vscode/
+
+# Ignore temporary files
+*.tmp
+*.temp
+*.log
+
+# Ignore backup files
+*~
+*.bak
+
+# Extra file extensions
+*.scvd
+*.luchi
