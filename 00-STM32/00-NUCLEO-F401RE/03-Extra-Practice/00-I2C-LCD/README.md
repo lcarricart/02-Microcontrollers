@@ -1,10 +1,18 @@
 ﻿# Connecting an LCD through I2C
 
-The following project aims to connectv an LCD to the development board using serial data (SDA) and serial clock (SCL) lines to avoid excesive GPIO usage.
+The following project aims to connect a LCD to the development board using serial data (SDA) and serial clock (SCL) lines to avoid excesive GPIO usage.
 
-## 🧩 Youtube tutorial
+## 📌 Finished prototype
 
+![prototype](i2c_lcd.jpg)
+
+## 🧩 Youtube tutorial & Libraries
+
+Watch the tutorial:
 https://www.youtube.com/watch?v=SHORUnKgpKE
+
+Download the LCD libraries for I2C communincation:
+https://github.com/sstaub/mbedLCDi2c
 
 
 ## 📌 8-Bit Expander Adresses (by Manufacturer)
