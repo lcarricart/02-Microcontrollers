@@ -9,3 +9,4 @@ The inertial measurement unit (IMU) is to be connected through I2C. Considering 
 
 ## 📌 Finished prototype
 
+![Prototype](prototype.jpg)

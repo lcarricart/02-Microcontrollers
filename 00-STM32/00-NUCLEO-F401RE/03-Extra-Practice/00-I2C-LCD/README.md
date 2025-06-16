@@ -2,10 +2,6 @@
 
 The following project aims to connect a LCD to the development board using serial data (SDA) and serial clock (SCL) lines to avoid excesive GPIO usage.
 
-## 📌 Finished prototype
-
-![prototype](i2c_lcd.jpg)
-
 ## 🧩 Youtube tutorial & Libraries
 
 Watch the tutorial:
@@ -20,3 +16,7 @@ https://github.com/sstaub/mbedLCDi2c
 This is a list of all possible address combination one could get bridging the different combinations in the I2C expander.
 
 ![8-bit Expander Adresses](IP_Addresses.png)
+
+## 📌 Finished prototype
+
+![prototype](i2c_lcd.jpg)
