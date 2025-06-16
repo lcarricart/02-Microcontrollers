@@ -1,3 +1,3 @@
 ﻿## 📌 Finished prototype
 
-![<img src="musicPlayer" width="200">](musicPlayer.jpg)
+![<img src="musicPlayer" width="100">](musicPlayer.jpg)
