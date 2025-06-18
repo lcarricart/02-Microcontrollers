@@ -1,5 +1,17 @@
-// Purpose of the program: Use the I2C protocol to communicate with the LCD and the 6-axis IMU (MPU)
-// Remarks: Even though both devices are fed with different voltages, the I2C lines can be wired to 3.3 V
+/*******************************************************************************************************************
+ * Objective of the program: I have two problems 
+    1) I need a magnetometer, and the only one I have is integrated in an Arduino Nano BLE 33.
+    2) I do not have a data cable to load a program in my Arduino board.
+   
+   Solution: I have adapted the program "01-IMU-Acc-Gyro" to read the sensor through my STM board. My main STM board
+   communicates with the Arduino through I2C to talk directly with magnetometer.
+ *******************************************************************************************************************
+ * Remarks: Even though both devices are fed with different voltages, the I2C lines can be wired to 3.3 V.
+ *******************************************************************************************************************
+ * Author: Luciano Carricart, https://github.com/lcarricart/
+ * Status: Information Engineering student at HAW Hamburg, Germany.
+ * Profile: https://www.linkedin.com/in/lucianocarricart/
+ *******************************************************************************************************************/
 
 #include "mbed.h"
 #include "LCDi2c.h"
