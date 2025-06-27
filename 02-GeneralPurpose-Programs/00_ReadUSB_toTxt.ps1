@@ -1,10 +1,10 @@
-# PowerShell reader of Serial output from a microcontroller into a .txt file
+# PowerShell reader into a .txt file
 
 # ------------ Arduino serial monitor + logger --------------------
 $Port  = 'COM7'          # check in Device Manager – COM = communication port
 $Baud  = 115200
 $stamp = Get-Date -Format "yyyyMMdd_HHmmss"
-$log   = "$env:USERPROFILE\Desktop\nano_log.txt"   # change path if you like
+$log   = "$env:USERPROFILE\Desktop\nano_datalog_mag2.txt"   # change path if you like
 
 # open the serial port
 $sp = [System.IO.Ports.SerialPort]::new(
