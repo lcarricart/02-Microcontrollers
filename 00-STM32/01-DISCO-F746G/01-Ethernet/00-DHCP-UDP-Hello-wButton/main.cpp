@@ -8,7 +8,7 @@
  * Profile: https://www.linkedin.com/in/lucianocarricart/
  *******************************************************************************************************************/
 
- /********************************************************************************************************************
+/********************************************************************************************************************
  *  Theory:
 
  When your board boots with DHCP enabled, it runs a DHCP client that talks to the DHCP server (usually your router):
@@ -38,56 +38,97 @@
 #include "EthernetInterface.h"
 #include "UDPSocket.h"
 
-  // MAC Address
-  // byte mac[] = {0x02, 0x00, 0xF7, 0x46, 0x00, 0x01};
+  // Button and LED
+InterruptIn button(BUTTON1);
+DigitalOut led(LED1);
 
-  // Network interface
-EthernetInterface net;
+// Allows me to delegate to a complex function from an ISR
+events::EventQueue queue(8 * 1024);         // bytes for the queue
+Thread worker(osPriorityNormal, 4 * 1024);
+
+// Network interface and socket kept alive for the whole app
+EthernetInterface  net;
+UDPSocket          sock;
+SocketAddress      pc;
+
+// Payload
+static const char  msg[] = "hello from MCU";
+
+// nsapi_error_t is an integer error-code type used by Mbed OS’s Network Socket API
+// functions like net.connect() and sock.open(&net) return an nsapi_error_t value.
+nsapi_error_t rc;
+
+// Function prototypes
+void onButtonPressed_isr();
+void onButton();                // Delegated from ISR onButtonPressed_isr()
+
+// MAC Address (02:00:F7:46:00:01)
+// byte mac[] = {0x02, 0x00, 0xF7, 0x46, 0x00, 0x01};
 
 int main() {
-    // nsapi_error_t is an integer error-code type used by Mbed OS’s Network Socket API
-    // functions like net.connect() and sock.open(&net) return an nsapi_error_t value.
-    nsapi_error_t rc = net.connect(); // DHCP
+    printf("\nMCU (Ethernet) --> Router --> PC (WiFi or Ethernet)\n");
 
-    // If the return is not ERROR_OK, then it failed
-    if (rc != NSAPI_ERROR_OK) {
-        printf("net.connect failed: %d\n", rc);
-        return 0;
-    }
+    do {
+        rc = net.connect(); // DHCP
+
+        if (rc != NSAPI_ERROR_OK) {
+            printf("Attempt net.connect failed: %d\n", rc);
+            printf("Retrying...\n");
+            ThisThread::sleep_for(2s);
+        }
+    } while (rc != NSAPI_ERROR_OK);               // If the return is not ERROR_OK, then it failed
 
     SocketAddress ip;                             // empty address container
     net.get_ip_address(&ip);                      // "net" stores the address in a variable
     printf("MCU IP: %s\n", ip.get_ip_address());  // getter() for the content of "ip"
 
-    UDPSocket sock;
-    rc = sock.open(&net);
-    if (rc != NSAPI_ERROR_OK) {
-        printf("sock.open failed: %d\n", rc);
-        net.disconnect();
-        return 0;
-    }
-    sock.set_timeout(2000);
+    do {
+        rc = sock.open(&net);
 
-    SocketAddress pc("192.168.178.38", 5005);        // <-- replace with your PC IP and chosen port
-    const char msg[] = "hello from MCU";
+        if (rc != NSAPI_ERROR_OK) {
+            printf("sock.open failed: %d\n", rc);
+            printf("Retrying...\n");
+            ThisThread::sleep_for(2s);
+        }
+    } while (rc != NSAPI_ERROR_OK);
+
+    pc = SocketAddress("192.168.178.38", 5005);      // !!! Replace with your PC IP (IPv4, LAN) and chosen port (programmed in PowerShell)
     rc = sock.sendto(pc, msg, sizeof(msg) - 1);
-    printf("sendto rc=%d, bytes=%u\n", rc, (unsigned)(sizeof(msg) - 1));
+    printf("Function call: sendto rc=%d, bytes=%u\n", rc, (unsigned)(sizeof(msg) - 1));
 
     char buf[64];
     SocketAddress from;
-    rc = sock.recvfrom(&from, buf, sizeof(buf));       // wait for echo
+    sock.set_timeout(2000);                            // If you wait for a reply (echo), set_timeout prevents hanging forever.
+    rc = sock.recvfrom(&from, buf, sizeof(buf));       // Waits for an echo (although not programmed finally)
     if (rc > 0) {
-        printf("reply %dB from %s:%d: %.*s\n",
+        printf("Reply %dB from %s:%d: %.*s\n",         // Precision string
             rc, from.get_ip_address(), from.get_port(), rc, buf);
     }
     else {
-        printf("no reply, rc=%d (timeout)\n", rc);  // NSAPI_ERROR_WOULD_BLOCK on timeout
+        printf("No reply received, rc=%d (timeout)\n", rc);  // NSAPI_ERROR_WOULD_BLOCK on timeout
     }
 
-    sock.close();
-    net.disconnect();
+    // When the program used to run one time only
+    // sock.close();
+    // net.disconnect();
+    // Actually a cleanup happens implicitly when the process ends, so you don’t need explicit close/disconnect.
 
-    while (true) { ThisThread::sleep_for(1s); }
+    button.fall(callback(onButtonPressed_isr));
+    worker.start(callback(&queue, &events::EventQueue::dispatch_forever));
+
+    while (true) {
+        // Wait only for interrupts
+        ThisThread::sleep_for(1s);
+    }
 }
 
+void onButtonPressed_isr() {
+    led = !led;
+    queue.call(onButton);      // Posts the handler, delegation
+}
 
+void onButton() {
+    rc = sock.sendto(pc, msg, sizeof(msg) - 1);
+    printf("New PING being sent!\n");
+    printf("Function call: sendto rc=%d, bytes=%u\n", rc, (unsigned)(sizeof(msg) - 1));
+}
