@@ -15,7 +15,7 @@ Send a small UDP packet from an STM32F746NG board to a Windows PC every time the
 - board: ST DISCO_F746NG (STM32F746NG MCU)  
 - network: router that provides DHCP; MCU wired to a LAN port; PC on the same LAN (Wi-Fi or Ethernet)  
 - mbed os: 6.x  
-- toolchain: Arm Compiler 6 or GCC Arm  
+- toolchain: Mbed Studio
 - pc: Windows 10/11 with PowerShell
 
 ## wiring

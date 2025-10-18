@@ -1,5 +1,5 @@
 /*******************************************************************************************************************
- * Objective:  Send a UDP packet to a PC only one time
+ * Objective:  Send a UDP packet to a PC only one time. [DHCP] MCU (Ethernet) --> Router --> PC (WiFi or Ethernet) 
  *******************************************************************************************************************
  * Context:  Adapted from Arduino IDE examples; refined to run on STM32F746NG, Mbed OS 6.
  *******************************************************************************************************************
