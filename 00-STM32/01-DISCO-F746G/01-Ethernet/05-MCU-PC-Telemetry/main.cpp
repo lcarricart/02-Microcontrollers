@@ -13,7 +13,7 @@
 
 #include "mbed.h"
 #include "EthernetInterface.h"    // https://github.com/ARMmbed/mbed-os/blob/master/connectivity/netsocket/include/netsocket/EthernetInterface.h
-// "EthernetInterface.cpp"           https://github.com/ARMmbed/mbed-os/blob/master/connectivity/netsocket/source/EthernetInterface.cpp
+ // "EthernetInterface.cpp"           https://github.com/ARMmbed/mbed-os/blob/master/connectivity/netsocket/source/EthernetInterface.cpp
 #include "UDPSocket.h"
 #include "I2C.h"
 #include "mbed-mpu6050/MPU6050.h" // https://github.com/ET-BE/MBED-MPU6050
@@ -107,6 +107,8 @@ int main() {
     char msg[256] = "";              // Payload
     snprintf(msg, sizeof(msg), "timestamp, accX, accY, accZ, gyroX, gyroY, gyroZ, temperature\r\n");
     sendPayload(msg);
+    ThisThread::sleep_for(10ms);     // Necessary to make the first payload show up
+    sendPayload("");                 // Necessary to make the first payload show up
     long long int offset = getTimeStamp_ms();
     led = 1;                         // Indicates start of transmission
 
