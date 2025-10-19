@@ -4,6 +4,7 @@
 Stream live IMU readings from an STM32F746NG board to a Windows PC through a direct Ethernet cable. The PC listens with a PowerShell script and appends each message to a .txt log. 
 Developed for feeding a Java GUI that plots data in real time, for the University subject "Algorithms and Data Structures".
 
+![IMU & STM32F746NG](demonstration0.jpg)
 ![PowerShell listener screenshot](demonstration1.png)
 ![Log file screenshot](demonstration2.png)
 
