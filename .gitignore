@@ -361,3 +361,71 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# -------------------------------------------------------------------------
+# Xilinx Vivado (Project Mode)
+# -------------------------------------------------------------------------
+
+# 1. Vivado Internal Database & Temp Files (CRITICAL to ignore)
+.Xil/
+.srcs/sources_1/bd/*/hdl/ # Ignore generated wrappers for Block Designs if you recreate them
+export_sim/
+
+# 2. Run Directories (Synthesis, Implementation results)
+*.runs/
+*.sim/
+*.cache/
+*.hw/
+*.ip_user_files/
+*.gen/
+
+# 3. Log, Journal, and Trace files
+# These are created every time you open Vivado
+vivado*.log
+vivado*.jou
+vivado*.str
+vivado_pid*.zip
+webtalk*.log
+webtalk*.jou
+hs_err_pid*
+
+# 4. Binary Output Files
+# Generally, don't commit these unless you are doing a "release"
+*.bit
+*.bin
+*.dcp
+*.mcs
+*.prm
+*.sysdef
+
+# 5. Debugging Probes
+*.ltx
+
+# -------------------------------------------------------------------------
+# Simulation (XSim / ModelSim / Questa)
+# -------------------------------------------------------------------------
+xsim.dir/
+*.wdb
+*.pb
+*.vcd
+work/
+transcript
+vsim.wlf
+
+# -------------------------------------------------------------------------
+# SDK / Vitis (If exporting Hardware)
+# -------------------------------------------------------------------------
+*.sdk/
+*.vitis/
+.metadata/
+RemoteSystemsTempFiles/
+.SDK_Logs/
+
+# -------------------------------------------------------------------------
+# OS and Editor Clutter
+# -------------------------------------------------------------------------
+.DS_Store
+Thumbs.db
+.vscode/
+*.swp
+*~
