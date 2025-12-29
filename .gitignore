@@ -499,5 +499,5 @@ Makefile
 # ========= Optional: project settings =========
 # Many teams KEEP these so others can import into CubeIDE easily.
 # If you prefer to ignore them, uncomment the following lines:
-# .settings/
-# *.prefs
+.settings/
+*.prefs
