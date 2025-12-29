@@ -430,3 +430,68 @@ Thumbs.db
 *.swp
 *~
 /04-FPGAs/00-Digital-Circuits-HAW/Sick Note DI.pdf
+
+# ---------------------------------------
+# STM32CubeIDE + STM32CubeMX (C/C++)
+# ---------------------------------------
+
+# CubeIDE (Eclipse) workspace / metadata
+.metadata/
+.recommenders/
+RemoteSystemsTempFiles/
+*.launch
+
+# CubeIDE project settings (user/local)
+.settings/
+*.prefs
+
+# Build outputs (common)
+Debug/
+Release/
+debug/
+release/
+build/
+out/
+bin/
+obj/
+
+# GCC/LD artifacts
+*.o
+*.a
+*.so
+*.d
+*.map
+*.elf
+*.axf
+*.hex
+*.bin
+*.lst
+*.srec
+*.siz
+*.su
+
+# CubeIDE generated make/cmake helpers (when applicable)
+*.mk
+*.make
+*.cmake
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+
+# CubeMX generated/temporary folders
+.mxproject
+.project
+.cproject
+*.ioc.user
+*.ioc.bak
+
+# CubeProgrammer / debug probe logs (if produced)
+*.stlink
+*.jlink
+*.gdb
+*.gdbinit
+
+# Core dumps / crash logs
+core
+core.*
