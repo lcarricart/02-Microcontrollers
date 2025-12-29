@@ -8,6 +8,8 @@
  *******************************************************************************************************************
  * Remarks: Even though both devices are fed with different voltages, the I2C lines can be wired to 3.3 V.
  *******************************************************************************************************************
+ * Development Environment: Arm Mbed Studio
+ *******************************************************************************************************************
  * Author: Luciano Carricart, https://github.com/lcarricart/
  * Status: Information Engineering student at HAW Hamburg, Germany.
  * Profile: https://www.linkedin.com/in/lucianocarricart/

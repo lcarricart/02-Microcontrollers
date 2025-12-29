@@ -1,7 +1,8 @@
 /*******************************************************************************************************************
  * Objective:  Send a UDP packet to a PC on each button press, under a shared LAN. [DHCP] MCU (Ethernet) --> Router --> PC (WiFi or Ethernet) 
  *******************************************************************************************************************
- * Context:  Adapted from Arduino IDE examples; refined to run on STM32F746NG, Mbed OS 6.
+ * Context:     - Adapted from Arduino IDE examples; refined to run on STM32F746NG, Mbed OS 6.
+ *              - Development environment: Arm Mbed Studio
  *******************************************************************************************************************
  * Author: Luciano Carricart, https://github.com/lcarricart/
  * Status: Information Engineering student, HAW Hamburg, Germany.

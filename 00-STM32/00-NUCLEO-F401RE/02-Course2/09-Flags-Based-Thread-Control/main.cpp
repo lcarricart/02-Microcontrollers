@@ -7,6 +7,8 @@
  The "4bit_LCD.cpp" file is created reusing the SPI-Communication project, and example songs are taken to create the
  "tunes.h" file.
  *******************************************************************************************************************
+ * Development Environment: Arm Mbed Studio
+ *******************************************************************************************************************
  * Author: Luciano Carricart, https://github.com/lcarricart/
  * Status: Information Engineering student at HAW Hamburg, Germany.
  * Profile: https://www.linkedin.com/in/lucianocarricart/

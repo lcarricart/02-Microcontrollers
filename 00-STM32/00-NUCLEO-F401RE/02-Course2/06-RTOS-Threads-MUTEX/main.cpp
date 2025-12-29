@@ -31,6 +31,8 @@
  + Even though some specific pins of the board are PWM-enabled, through Mbed OS software we can define other pins as
  PwmOut or PwmIn too, despite of its hardware default configuration.
  *******************************************************************************************************************
+ * Development Environment: Arm Mbed Studio
+ *******************************************************************************************************************
  * Author: Luciano Carricart, https://github.com/lcarricart/
  * Status: Information Engineering student at HAW Hamburg, Germany.
  * Profile: https://www.linkedin.com/in/lucianocarricart/

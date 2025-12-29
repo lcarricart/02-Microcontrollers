@@ -2,6 +2,8 @@
  * Objective of the program: Simplify "Improved-Music-Player" file by implementing the same solution using the PC 
  display instead of the LCD.
  *******************************************************************************************************************
+ * Development Environment: Arm Mbed Studio
+ *******************************************************************************************************************
  * Author: Luciano Carricart, https://github.com/lcarricart/
  * Status: Information Engineering student at HAW Hamburg, Germany.
  * Profile: https://www.linkedin.com/in/lucianocarricart/

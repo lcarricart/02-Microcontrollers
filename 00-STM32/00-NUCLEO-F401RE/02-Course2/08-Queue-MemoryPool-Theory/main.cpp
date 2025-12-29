@@ -18,6 +18,8 @@
  more advanced functionality (at the cost of using more flash memory) you can switch to the standard printf library 
  configuring it in mbed_app.json file by overriding the parameter target.printf_lib with the value std.
  *******************************************************************************************************************
+ * Development Environment: Arm Mbed Studio
+ *******************************************************************************************************************
  * Author: Luciano Carricart, https://github.com/lcarricart/
  * Status: Information Engineering student at HAW Hamburg, Germany.
  * Profile: https://www.linkedin.com/in/lucianocarricart/

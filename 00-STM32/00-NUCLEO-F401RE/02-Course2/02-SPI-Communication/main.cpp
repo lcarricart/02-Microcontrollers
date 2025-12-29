@@ -4,6 +4,8 @@
  parallel signals but the latest require simpler wiring. Parallel signals involve transmitting multiple bits 
  simultaneously on separate wires.
  *******************************************************************************************************************
+ * Development Environment: Arm Mbed Studio
+ *******************************************************************************************************************
  * Author: Luciano Carricart, https://github.com/lcarricart/
  * Status: Information Engineering student at HAW Hamburg, Germany.
  * Profile: https://www.linkedin.com/in/lucianocarricart/

@@ -28,6 +28,8 @@
  Lastly, a common mistake is to connect the PB_8 and PB_9 inverted. The SDA of the slave should go to the SDA of the
  master too. Doing this typically throws an SOS signal from the internal LED, as part of the OS behavior. 
  *******************************************************************************************************************
+ * Development Environment: Arm Mbed Studio
+ *******************************************************************************************************************
  * Author: Luciano Carricart, https://github.com/lcarricart/
  * Status: Information Engineering student at HAW Hamburg, Germany.
  * Profile: https://www.linkedin.com/in/lucianocarricart/

@@ -1,6 +1,8 @@
 /*******************************************************************************************************************
  * Objective of the program: UART demonstration. Use the PC terminal to display information sent by the microcontroller.
  *******************************************************************************************************************
+ * Development Environment: Arm Mbed Studio
+ *******************************************************************************************************************
  * Author: Luciano Carricart, https://github.com/lcarricart/
  * Status: Information Engineering student at HAW Hamburg, Germany.
  * Profile: https://www.linkedin.com/in/lucianocarricart/

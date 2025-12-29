@@ -6,6 +6,8 @@
  * Learning outcome: In the search of digital switches, relays prove to be a very useful alternative. However, there
  must be ways to control switches through the microcontroller itself.
  *******************************************************************************************************************
+ * Development Environment: Arm Mbed Studio
+ *******************************************************************************************************************
  * Author: Luciano Carricart, https://github.com/lcarricart/
  * Status: Information Engineering student at HAW Hamburg, Germany.
  * Profile: https://www.linkedin.com/in/lucianocarricart/

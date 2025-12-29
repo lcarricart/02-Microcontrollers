@@ -4,7 +4,8 @@
    transmitted to a PC, to be later manipulated and displayed with a Java GUI application.
    LED1 ON/OFF indicates the state of data transmission.
  *******************************************************************************************************************
- * Context:  Adapted from Arduino IDE examples; refined to run on STM32F746NG, Mbed OS 6.
+ * Context:     - Adapted from Arduino IDE examples; refined to run on STM32F746NG, Mbed OS 6.
+ *              - Development environment: Arm Mbed Studio
  *******************************************************************************************************************
  * Author: Luciano Carricart, https://github.com/lcarricart/
  * Status: Information Engineering student, HAW Hamburg, Germany.

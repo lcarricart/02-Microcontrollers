@@ -24,8 +24,9 @@
    7) This alternation continues forever: Ping → Pong → Ping → … — hence “ping-pong”.
 
  *******************************************************************************************************************
- * Context:  This is part of a major programming project, where live telemetry is transmitted to a PC, to be later
-   manipulated and displayed with a Java GUI application.
+ * Context:     - This is part of a major programming project, where live telemetry is transmitted to a PC, to be later
+                  manipulated and displayed with a Java GUI application.
+ *              - Development environment: Arm Mbed Studio
  *******************************************************************************************************************
  * Author: Luciano Carricart, https://github.com/lcarricart/
  * Status: Information Engineering student, HAW Hamburg, Germany.

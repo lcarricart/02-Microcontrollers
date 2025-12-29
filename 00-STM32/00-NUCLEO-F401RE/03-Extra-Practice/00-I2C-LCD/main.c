@@ -1,5 +1,6 @@
 // Purpose of the program: Use the I2C protocol to communicate with the LCD and the 6-axis IMU
 // Remarks: Even though both devices are fed with different voltages, the I2C lines can be wired to 3.3 V
+// Dev Environment: Arm Mbed Studio
 
 #include "mbed.h"
 #include "LCDi2c.h"

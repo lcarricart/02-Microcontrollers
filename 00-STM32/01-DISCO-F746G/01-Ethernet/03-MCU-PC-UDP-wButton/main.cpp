@@ -3,7 +3,8 @@
    an Ethernet cable. This is the first step towards transferring live data to the PC for a major programming project,
    without internet.
  *******************************************************************************************************************
- * Context:  Adapted from Arduino IDE examples; refined to run on STM32F746NG, Mbed OS 6.
+ * Context:     - Adapted from Arduino IDE examples; refined to run on STM32F746NG, Mbed OS 6.
+ *              - Development environment: Arm Mbed Studio
  *******************************************************************************************************************
  * Author: Luciano Carricart, https://github.com/lcarricart/
  * Status: Information Engineering student, HAW Hamburg, Germany.

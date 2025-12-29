@@ -1,6 +1,8 @@
 /*******************************************************************************************************************
  * Objective of the program: Theory on semaphores and threads within an RTOS environment. Prints to the PC.
  *******************************************************************************************************************
+ * Development Environment: Arm Mbed Studio
+ *******************************************************************************************************************
  * Author: Luciano Carricart, https://github.com/lcarricart/
  * Status: Information Engineering student at HAW Hamburg, Germany.
  * Profile: https://www.linkedin.com/in/lucianocarricart/

@@ -8,6 +8,8 @@
  There are different strategies to control the flow safely, and the one imnplemented here is flag-based (or 
  state-variable) thread synchronization.
  *******************************************************************************************************************
+ * Development Environment: Arm Mbed Studio
+ *******************************************************************************************************************
  * Author: Luciano Carricart, https://github.com/lcarricart/
  * Status: Information Engineering student at HAW Hamburg, Germany.
  * Profile: https://www.linkedin.com/in/lucianocarricart/
