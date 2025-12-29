@@ -429,3 +429,48 @@ Thumbs.db
 .vscode/
 *.swp
 *~
+
+
+# ----------------------------
+# Xilinx Vivado (2024.1)
+# ----------------------------
+
+# Logs / command journals
+*.jou
+*.log
+
+# Vivado working / cache directories
+.cache/
+.xil/
+.ip_user_files/
+.hw/
+.runs/
+.sim/
+
+# Webtalk / usage reports
+.webtalk/
+webtalk.log
+webtalk_*.log
+webtalk_*.jou
+usage_statistics_webtalk.xml
+usage_statistics_webtalk.html
+xilinx_usage_statistics.xml
+
+# Simulation outputs (xsim)
+xsim.dir/
+*.wdb
+*.wcfg
+
+# Generated design outputs / bitstreams / checkpoints / exports
+*.dcp
+*.bit
+*.bin
+*.mcs
+*.ltx
+*.xsa
+
+# Optional: if you generate BD/IP products and don’t want them tracked
+# (Keep your .bd and .xci under version control; ignore generated products)
+.srcs/sources_1/bd/**/hdl/
+.srcs/sources_1/bd/**/ip/
+.srcs/sources_1/bd/**/sim/
