@@ -433,19 +433,23 @@ Thumbs.db
 
 # ---------------------------------------
 # STM32CubeIDE + STM32CubeMX (C/C++)
+# Keep source/config; ignore build/workspace outputs
 # ---------------------------------------
 
-# CubeIDE (Eclipse) workspace / metadata
+# ========= Must-keep (do NOT ignore) =========
+# Core/            (your code: Inc/, Src/, Startup/)
+# Drivers/         (HAL + CMSIS)
+# Middlewares/     (FreeRTOS, USB, LWIP, etc. if used)
+# *.ioc            (CubeMX config)
+# *.ld             (linker scripts)
+# startup_*.s      (startup files, usually under Core/Startup)
+
+# ========= CubeIDE / Eclipse workspace noise =========
 .metadata/
 .recommenders/
 RemoteSystemsTempFiles/
-*.launch
 
-# CubeIDE project settings (user/local)
-.settings/
-*.prefs
-
-# Build outputs (common)
+# ========= Build output folders =========
 Debug/
 Release/
 debug/
@@ -455,14 +459,14 @@ out/
 bin/
 obj/
 
-# GCC/LD artifacts
+# ========= Compiled artifacts / tool outputs =========
 *.o
+*.d
 *.a
 *.so
-*.d
-*.map
 *.elf
 *.axf
+*.map
 *.hex
 *.bin
 *.lst
@@ -470,28 +474,30 @@ obj/
 *.siz
 *.su
 
-# CubeIDE generated make/cmake helpers (when applicable)
-*.mk
-*.make
-*.cmake
+# ========= Debug/server temporary files =========
+*.gdb
+*.gdbinit
+*.stlink
+*.jlink
+
+# ========= CubeMX / ST tool leftovers =========
+*.jou
+*.log
+*.bak
+*.tmp
+
+# CubeMX sometimes creates a metadata file (safe to ignore or track; ignoring is common)
+.mxproject
+
+# If your project uses CMake-based generation
 CMakeFiles/
 CMakeCache.txt
 cmake_install.cmake
 Makefile
+*.cmake
 
-# CubeMX generated/temporary folders
-.mxproject
-.project
-.cproject
-*.ioc.user
-*.ioc.bak
-
-# CubeProgrammer / debug probe logs (if produced)
-*.stlink
-*.jlink
-*.gdb
-*.gdbinit
-
-# Core dumps / crash logs
-core
-core.*
+# ========= Optional: project settings =========
+# Many teams KEEP these so others can import into CubeIDE easily.
+# If you prefer to ignore them, uncomment the following lines:
+# .settings/
+# *.prefs
