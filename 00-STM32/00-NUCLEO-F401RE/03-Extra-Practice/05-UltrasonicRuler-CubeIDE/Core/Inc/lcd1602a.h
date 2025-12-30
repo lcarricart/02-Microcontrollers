@@ -44,7 +44,7 @@ typedef struct {
  ************************************/
 
 void LCD_Init(LCD1602A *lcd, I2C_HandleTypeDef *i2cHandle);
-void LCD_ClearDisplay();
+void LCD_ClearDisplay(LCD1602A *lcd);
 void LCD_WriteString(LCD1602A *lcd, char *string);
 void LCD_SetBacklight(LCD1602A *lcd, uint8_t backlightState);
 void LCD_SetCursor(LCD1602A *lcd, uint8_t row, uint8_t col);
