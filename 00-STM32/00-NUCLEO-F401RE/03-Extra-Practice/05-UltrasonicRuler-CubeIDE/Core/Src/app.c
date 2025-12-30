@@ -13,6 +13,12 @@
  * 				  needs to be set from CubeMX. (This timer is not exploited to professional use, since it could also
  * 				  improve the precision of my TRIGGER, but I decided to go for the simpler and understandable approach)
  *******************************************************************************************************************
+ * Conclusion: The project works but proves that the use of CubeIDE requires professional knowledge in the field. It is not
+ * trivial at all to include dependencies from other developers, considering the CubeMX configurations involved in the process.
+ * It may be possible to try to replicate the .ioc files that are provided in the repositories of the dependencies, and skip
+ * some of this struggle. However, operating with this IDE requires more studying. A great step forward would be reading the
+ * "Mastering STM32" by Carmine Noviello, covering HAL, I2C, SPI, UART peripherals, timers, and ADC configurations.
+ *******************************************************************************************************************
  * Author: Luciano Carricart, https://github.com/lcarricart/
  * Status: Information Engineering student, HAW Hamburg, Germany.
  * Profile: https://www.linkedin.com/in/lucianocarricart/
