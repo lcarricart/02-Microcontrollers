@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="RISC_tb_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="RISC_tb" />
+            <top_module name="global" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="0.000 ns"></ZoomStartTime>
+      <ZoomEndTime time="1,220.001 ns"></ZoomEndTime>
+      <Cursor1Time time="450.000 ns"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="179"></NameColumnWidth>
+      <ValueColumnWidth column_width="75"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="30" />
+   <wvobject type="divider" fp_name="divider1027">
+      <obj_property name="label">TESTBENCH</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject fp_name="/RISC_tb/clk" type="logic">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/RISC_tb/rstn" type="logic">
+      <obj_property name="ElementShortName">rstn</obj_property>
+      <obj_property name="ObjectShortName">rstn</obj_property>
+   </wvobject>
+   <wvobject fp_name="/RISC_tb/i_RISC_top/rst" type="logic">
+      <obj_property name="ElementShortName">rst</obj_property>
+      <obj_property name="ObjectShortName">rst</obj_property>
+   </wvobject>
+   <wvobject fp_name="/RISC_tb/SW0_s" type="array">
+      <obj_property name="ElementShortName">SW0_s[7:0]</obj_property>
+      <obj_property name="ObjectShortName">SW0_s[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/RISC_tb/SW1_s" type="array">
+      <obj_property name="ElementShortName">SW1_s[7:0]</obj_property>
+      <obj_property name="ObjectShortName">SW1_s[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/RISC_tb/LED0_s" type="array">
+      <obj_property name="ElementShortName">LED0_s[7:0]</obj_property>
+      <obj_property name="ObjectShortName">LED0_s[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/RISC_tb/LED1_s" type="array">
+      <obj_property name="ElementShortName">LED1_s[7:0]</obj_property>
+      <obj_property name="ObjectShortName">LED1_s[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/RISC_tb/PERIOD" type="other">
+      <obj_property name="ElementShortName">PERIOD</obj_property>
+      <obj_property name="ObjectShortName">PERIOD</obj_property>
+   </wvobject>
+   <wvobject fp_name="/RISC_tb/OFFSET" type="other">
+      <obj_property name="ElementShortName">OFFSET</obj_property>
+      <obj_property name="ObjectShortName">OFFSET</obj_property>
+   </wvobject>
+   <wvobject type="divider" fp_name="divider1027">
+      <obj_property name="label">Instruction Fetch</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject fp_name="/RISC_tb/i_RISC_top/PC_s" type="array">
+      <obj_property name="ElementShortName">PC_s[9:0]</obj_property>
+      <obj_property name="ObjectShortName">PC_s[9:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/RISC_tb/i_RISC_top/instruction_s" type="array">
+      <obj_property name="ElementShortName">instruction_s[15:0]</obj_property>
+      <obj_property name="ObjectShortName">instruction_s[15:0]</obj_property>
+   </wvobject>
+   <wvobject type="divider" fp_name="divider1027">
+      <obj_property name="label">Register File</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject fp_name="/RISC_tb/i_RISC_top/i_RF/rf_cs" type="array">
+      <obj_property name="ElementShortName">rf_cs[7:0][15:0]</obj_property>
+      <obj_property name="ObjectShortName">rf_cs[7:0][15:0]</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+   </wvobject>
+   <wvobject type="divider" fp_name="divider1027">
+      <obj_property name="label">Operands</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject fp_name="/RISC_tb/i_RISC_top/i_RF/src0" type="array">
+      <obj_property name="ElementShortName">src0[2:0]</obj_property>
+      <obj_property name="ObjectShortName">src0[2:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/RISC_tb/i_RISC_top/i_RF/src1" type="array">
+      <obj_property name="ElementShortName">src1[2:0]</obj_property>
+      <obj_property name="ObjectShortName">src1[2:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/RISC_tb/i_RISC_top/i_RF/dst" type="array">
+      <obj_property name="ElementShortName">dst[2:0]</obj_property>
+      <obj_property name="ObjectShortName">dst[2:0]</obj_property>
+   </wvobject>
+   <wvobject type="divider" fp_name="divider1027">
+      <obj_property name="label">ALU </obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject fp_name="/RISC_tb/i_RISC_top/i_ALU/opcode" type="array">
+      <obj_property name="ElementShortName">opcode[3:0]</obj_property>
+      <obj_property name="ObjectShortName">opcode[3:0]</obj_property>
+      <obj_property name="Radix">BINARYRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/RISC_tb/i_RISC_top/i_ALU/data_src0" type="array">
+      <obj_property name="ElementShortName">data_src0[15:0]</obj_property>
+      <obj_property name="ObjectShortName">data_src0[15:0]</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/RISC_tb/i_RISC_top/i_ALU/data_src1" type="array">
+      <obj_property name="ElementShortName">data_src1[15:0]</obj_property>
+      <obj_property name="ObjectShortName">data_src1[15:0]</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/RISC_tb/i_RISC_top/i_ALU/data_dst" type="array">
+      <obj_property name="ElementShortName">data_dst[15:0]</obj_property>
+      <obj_property name="ObjectShortName">data_dst[15:0]</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject type="divider" fp_name="divider1038">
+      <obj_property name="label">Address Decoder</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject fp_name="/RISC_tb/i_RISC_top/addr_s" type="array">
+      <obj_property name="ElementShortName">addr_s[10:0]</obj_property>
+      <obj_property name="ObjectShortName">addr_s[10:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/RISC_tb/i_RISC_top/cs_s" type="array">
+      <obj_property name="ElementShortName">cs_s[1:0]</obj_property>
+      <obj_property name="ObjectShortName">cs_s[1:0]</obj_property>
+      <obj_property name="Radix">BINARYRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/RISC_tb/i_RISC_top/wren_s" type="logic">
+      <obj_property name="ElementShortName">wren_s</obj_property>
+      <obj_property name="ObjectShortName">wren_s</obj_property>
+   </wvobject>
+   <wvobject type="divider" fp_name="divider1187">
+      <obj_property name="label">DMEM</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject fp_name="/RISC_tb/i_RISC_top/i_DMEM/mem" type="array">
+      <obj_property name="ElementShortName">mem[1023:0][15:0]</obj_property>
+      <obj_property name="ObjectShortName">mem[1023:0][15:0]</obj_property>
+   </wvobject>
+</wave_config>
