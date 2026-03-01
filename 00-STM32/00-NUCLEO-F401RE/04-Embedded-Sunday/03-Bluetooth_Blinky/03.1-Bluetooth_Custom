@@ -1,0 +1,58 @@
+// Objective: use the STM32duino to connect a Bluetooth module HC-05 (ZS-040) and blink an LED in different patterns (also Serial monitor printing)
+
+#include <Arduino.h>
+#include <stdio.h>
+
+#define LED1 PA5
+
+/* https://github.com/stm32duino/Arduino_Core_STM32/wiki/API/c8c6043f7d8e70ce8d1b11298112fb16bbfe28b1
+  PA2 & PA3 <may> conflict (may not). A pin does not need to be “predefined as TX/RX” in your sketch to be usable as UART.
+  It only needs to be a valid UART alternate-function pin for the MCU. That's why we use them in other positions.
+*/
+#define RX PA10
+#define TX PA9
+HardwareSerial Serial_BLE(RX, TX);
+
+String message = "";
+
+void setup() {
+  pinMode(LED1, OUTPUT);
+
+  // For on-screen display w/ computer
+  // Could be using the same RX/TX pins as Bluetooth
+  Serial.begin(9600);
+  Serial.println("Start of the application!");
+
+  // For BLE module
+  Serial_BLE.begin(9600);
+}
+
+void loop() {
+  if(Serial_BLE.available()) {
+    message = Serial_BLE.readString();
+    message.trim();   // removes \r, \n, spaces
+
+    Serial.print("Received: ");
+    Serial.println(message);
+
+    if (message == "ON") {
+      Serial.println(message);
+      digitalWrite(LED1, HIGH);
+      delay(500);     
+    } else if (message == "OFF") {
+      Serial.println(message);
+      digitalWrite(LED1, LOW);
+      delay(500);             
+    } else if (message == "BLINK") {
+      Serial.println(message);
+      digitalWrite(LED1, HIGH);
+      delay(500);            
+      digitalWrite(LED1, LOW);
+      delay(500);
+      digitalWrite(LED1, HIGH);
+      delay(500);            
+      digitalWrite(LED1, LOW);
+      delay(500);          
+    }        
+  }
+}

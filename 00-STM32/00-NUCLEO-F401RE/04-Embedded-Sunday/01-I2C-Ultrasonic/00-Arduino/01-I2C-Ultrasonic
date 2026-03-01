@@ -1,0 +1,17 @@
+// Arduino with an ultrasonic and LCD via I2C and shift register
+ 
+#include "LiquidCrystal_I2C.h"     // include the library code
+LiquidCrystal_I2C lcd(0x27,16,2);  // set the LCD address and the number of columns and rows
+ 
+void setup() {
+  lcd.begin();  
+}
+ 
+void loop() { 
+  lcd.setCursor(0,0);  // set the cursor to column 0, line 0
+  lcd.print("DIYEngineers.com");
+  lcd.setCursor(0,1);  // set the cursor to column 0, line 1
+  lcd.print("1602 LCD");
+  delay(100);  
+  lcd.clear(); // Clears the display 
+}
