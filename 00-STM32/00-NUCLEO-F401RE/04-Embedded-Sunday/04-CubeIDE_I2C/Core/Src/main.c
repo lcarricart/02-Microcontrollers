@@ -4,19 +4,28 @@
  * @file           	: main.c
  * @brief          	: Main program body
  *******************************************************************************************************************
- * Objective		: Connect a sensor via I2C and display its value using the ITM Data Monitor.
+ * Objective				: Connect a sensor via I2C and display its value using the ITM Data Monitor.
  *******************************************************************************************************************
- * Remarks			: - CubeIDE
- * 					  - Based on the following video https://www.youtube.com/watch?v=isOekyygpR8
+ * Remarks					: - CubeIDE
+ * 					  				- Based on the following video https://www.youtube.com/watch?v=isOekyygpR8
+ * 					  				- MPU6050 drivers https://github.com/wowawhite/HAL_MPU6050.git
+ * 					  					(files used are I2Cdev.c/h and MPU6050.c/h)
+ * 					  				- Drivers were slightly adapted to this board
  *******************************************************************************************************************
- * Author			: Luciano Carricart
- * Status			: Information Engineering student, HAW Hamburg, Germany.
- * Profile			: https://www.linkedin.com/in/lucianocarricart/
+ * Lessons Learned	: - I realized the MPU6050_testConnection() would be "false" every time. The value of the
+ * 											pull-up resistors used mattered. Using 4,7k allowed discovery.
+ *******************************************************************************************************************
+ * Author						: Luciano Carricart
+ * Status						: Information Engineering student, HAW Hamburg, Germany.
+ * Profile					: https://www.linkedin.com/in/lucianocarricart/
  *******************************************************************************************************************
 */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include <stdio.h>
+#include <stdbool.h>
+#include "MPU6050.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -44,7 +53,8 @@ I2C_HandleTypeDef hi2c1;
 UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
-
+/* extern USBD_HandleTypeDef hUsbDeviceFS; */
+extern MPU6050_t mpu6050;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -69,7 +79,7 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
-  uint8_t buffer[12];
+
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -94,6 +104,20 @@ int main(void)
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
 
+  /* Light up the LED to signal app start */
+	HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
+	printf("Application started!\n");
+
+	int16_t accX, accY, accZ = 0;
+	bool testPassed = false;
+
+  mpu6050.devAddr = MPU6050_DEFAULT_ADDRESS;
+  MPU6050_initialize();
+  HAL_Delay(50);
+
+  testPassed = MPU6050_testConnection();
+  printf("MPU6050 Test outcome = %s \n", (testPassed == 0 ? "unsuccessful" : "successful"));
+  HAL_Delay(50);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -101,8 +125,13 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-	  printf("Hi \n");
-	  HAL_Delay(1000);
+  	/* Read sensor values of interest (int types) */
+  	accX = (int32_t) MPU6050_getAccelerationX();
+  	accY = (int32_t) MPU6050_getAccelerationY();
+  	accZ = (int32_t) MPU6050_getAccelerationZ();
+
+  	printf("accX = %d  |  accY = %d  |  accZ = %d \n", accX, accY, accZ);
+  	HAL_Delay(200);
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
