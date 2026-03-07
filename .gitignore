@@ -474,30 +474,8 @@ obj/
 *.siz
 *.su
 
-# ========= Debug/server temporary files =========
-*.gdb
-*.gdbinit
-*.stlink
-*.jlink
-
 # ========= CubeMX / ST tool leftovers =========
 *.jou
 *.log
 *.bak
 *.tmp
-
-# CubeMX sometimes creates a metadata file (safe to ignore or track; ignoring is common)
-.mxproject
-
-# If your project uses CMake-based generation
-CMakeFiles/
-CMakeCache.txt
-cmake_install.cmake
-Makefile
-*.cmake
-
-# ========= Optional: project settings =========
-# Many teams KEEP these so others can import into CubeIDE easily.
-# If you prefer to ignore them, uncomment the following lines:
-.settings/
-*.prefs
