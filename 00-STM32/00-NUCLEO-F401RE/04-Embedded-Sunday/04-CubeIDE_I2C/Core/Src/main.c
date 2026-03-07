@@ -4,9 +4,10 @@
  * @file           	: main.c
  * @brief          	: Main program body
  *******************************************************************************************************************
- * Objective		: Learn how to establish I2C comm in the STM Cube environment and display values in the console.
+ * Objective		: Connect a sensor via I2C and display its value using the ITM Data Monitor.
  *******************************************************************************************************************
- * Context			: - CubeIDE
+ * Remarks			: - CubeIDE
+ * 					  - Based on the following video https://www.youtube.com/watch?v=isOekyygpR8
  *******************************************************************************************************************
  * Author			: Luciano Carricart
  * Status			: Information Engineering student, HAW Hamburg, Germany.
@@ -68,7 +69,7 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
-
+  uint8_t buffer[12];
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -100,7 +101,8 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-
+	  printf("Hi \n");
+	  HAL_Delay(1000);
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
@@ -259,7 +261,18 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+/* Function called by printf() */
+int _write(int file, char *ptr, int len)
+{
+  (void)file;
+  int DataIdx;
 
+  for (DataIdx = 0; DataIdx < len; DataIdx++)
+  {
+    ITM_SendChar(*ptr++);
+  }
+  return len;
+}
 /* USER CODE END 4 */
 
 /**

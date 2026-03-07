@@ -8,6 +8,7 @@
  *******************************************************************************************************************
  * Remarks			: - CubeIDE
  * 					  - Based on the following video https://www.youtube.com/watch?v=iR34qmfyZtU
+ * 					  - Another example of how to do this via UART and PC CMD console https://www.youtube.com/watch?v=isOekyygpR8 (beginning)
  * 					  - While using the printf() function, one should not forget the "\n"
  * 					  - We're retargeting standardd IO functions to use it for printf() purposes. The ((weak))
  * 					    attribute in syscalls.c marks a function as a default implementation (can be overriden).
@@ -31,7 +32,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include <stdio.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
