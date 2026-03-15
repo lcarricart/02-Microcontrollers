@@ -18,7 +18,7 @@
 #define AUDIO_IN_PCM_BUFFER_SIZE                   4*2304 /* buffer size in half-word */
 
 #define REC_WAVE_NAME "Wave.wav"
-#define DEFAULT_TIME_REC                      5  /* Recording time in second (default: 20s) */
+#define DEFAULT_TIME_REC                     5  /* Recording time in second (default: 20s) */
 #define REC_SAMPLE_LENGTH   (DEFAULT_TIME_REC * DEFAULT_AUDIO_IN_FREQ * 1 * 2)
 
 typedef enum {

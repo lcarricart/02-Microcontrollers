@@ -10,8 +10,8 @@
   ******************************************************************************
   * @remarks
   * 	- For some reason the app does not leave the RECORD_START state. GitHub repo
-  * 	says this could be due to an unrecognized SD card. I doubt it but it could
-  * 	be.
+  * 		says this could be due to an unrecognized SD card. I doubt it but it could
+  * 		be.
   ******************************************************************************
   */
 /* USER CODE END Header */
@@ -160,7 +160,7 @@ int main(void)
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-  HAL_Init();
+   HAL_Init();
 
   /* USER CODE BEGIN Init */
 
@@ -189,7 +189,7 @@ int main(void)
   MX_LTDC_Init();
   MX_QUADSPI_Init();
   MX_RTC_Init();
-  MX_SAI2_Init();
+  // MX_SAI2_Init(); // DISABLED - Let BSP driver handle SAI init
   MX_SDMMC1_SD_Init();
   MX_SPDIFRX_Init();
   MX_TIM1_Init();
@@ -850,7 +850,7 @@ static void MX_SAI2_Init(void)
   hsai_BlockA2.Init.OutputDrive = SAI_OUTPUTDRIVE_DISABLE;
   hsai_BlockA2.Init.NoDivider = SAI_MASTERDIVIDER_ENABLE;
   hsai_BlockA2.Init.FIFOThreshold = SAI_FIFOTHRESHOLD_EMPTY;
-  hsai_BlockA2.Init.AudioFrequency = SAI_AUDIO_FREQUENCY_192K;
+  hsai_BlockA2.Init.AudioFrequency = SAI_AUDIO_FREQUENCY_16K;
   hsai_BlockA2.Init.SynchroExt = SAI_SYNCEXT_DISABLE;
   hsai_BlockA2.Init.MonoStereoMode = SAI_STEREOMODE;
   hsai_BlockA2.Init.CompandingMode = SAI_NOCOMPANDING;
@@ -1707,7 +1707,7 @@ void assert_failed(uint8_t *file, uint32_t line)
 {
   /* USER CODE BEGIN 6 */
   /* User can add his own implementation to report the file name and line number,
-     ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
+     ex: printf("audio init ok\r\n");parameters value: file %s on line %d\r\n", file, line) */
   /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */

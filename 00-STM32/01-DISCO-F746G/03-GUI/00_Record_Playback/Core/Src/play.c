@@ -10,6 +10,8 @@
 static AUDIO_OUT_BufferTypeDef  BufferCtl;
 static int16_t FilePos = 0;
 static __IO uint32_t uwVolume = 70;
+static uint32_t play_t0 = 0;
+static int16_t mono_temp[AUDIO_OUT_BUFFER_SIZE / 4]; /* Temp buffer for mono read before stereo expansion */
 
 int tes1,tes2;
 
@@ -124,19 +126,40 @@ AUDIO_ErrorTypeDef AUDIO_PLAYER_Init(void)
 }
 
 /**
+  * @brief  Expand mono 16-bit samples to stereo interleaved
+  * @param  mono: Source mono buffer (int16_t array)
+  * @param  stereo: Destination stereo buffer (int16_t array, 2x size)
+  * @param  mono_samples: Number of mono samples to convert
+  * @retval None
+  */
+static void MonoToStereo(int16_t *mono, int16_t *stereo, uint32_t mono_samples)
+{
+  for (uint32_t i = 0; i < mono_samples; i++)
+  {
+    stereo[2*i]     = mono[i];  // Left
+    stereo[2*i + 1] = mono[i];  // Right
+  }
+}
+
+/**
   * @brief  Initializes the Wave player.
   * @param  AudioFreq: Audio sampling frequency
   * @retval None
   */
 static uint8_t PlayerInit(uint32_t AudioFreq)
 {
-  /* Initialize the Audio codec and all related peripherals (I2S, I2C, IOExpander, IOs...) */
+  printf("PLAY_INIT_REQ: freq=%lu volume=%lu\r\n", AudioFreq, uwVolume);
+  /* Set frequency first to configure PLL clock before SAI init */
+  BSP_AUDIO_OUT_SetFrequency(AudioFreq);
+  /* Initialize the Audio codec and all related peripherals */
   if(BSP_AUDIO_OUT_Init(OUTPUT_DEVICE_BOTH, uwVolume, AudioFreq) != 0)
   {
+    printf("PLAY_INIT_DONE: FAILED\r\n");
     return 1;
   }
   else
   {
+    printf("PLAY_INIT_DONE: freq=%lu init_ok\r\n", AudioFreq);
     BSP_AUDIO_OUT_SetAudioFrameSlot(CODEC_AUDIOFRAME_SLOT_02);
     return 0;
   }
@@ -159,7 +182,10 @@ static AUDIO_ErrorTypeDef GetFileInfo(uint16_t file_idx, WAVE_FormatTypeDef *inf
     /* Fill the buffer to Send */
     if(f_read(&SDFile, info, sizeof(WaveReadFormat), (void *)&bytesread) == FR_OK)
     {
-            return AUDIO_ERROR_NONE;
+      printf("PLAY_HDR: SR=%lu BR=%lu BA=%u BPS=%u CH=%u FileSize=%lu\r\n",
+             info->SampleRate, info->ByteRate, info->BlockAlign,
+             info->BitPerSample, info->NbrChannels, info->FileSize);
+      return AUDIO_ERROR_NONE;
     }
     f_close(&SDFile);
   }
@@ -187,16 +213,21 @@ AUDIO_ErrorTypeDef AUDIO_PLAYER_Start(uint8_t idx)
 
     /* Get Data from USB Flash Disk */
     f_lseek(&SDFile, 0);
+    play_t0 = HAL_GetTick();
 
-    /* Fill whole buffer at first time */
-    if(f_read(&SDFile,
-              &BufferCtl.buff[0],
-              AUDIO_OUT_BUFFER_SIZE,
-              (void *)&bytesread) == FR_OK)
+    /* Fill whole buffer at first time - read mono then expand to stereo */
+    uint32_t mono_bytes = AUDIO_OUT_BUFFER_SIZE / 2; /* 4096 bytes mono = 2048 samples */
+    if(f_read(&SDFile, mono_temp, mono_bytes, (void *)&bytesread) == FR_OK)
     {
         if(bytesread != 0)
         {
-          BSP_AUDIO_OUT_Play((uint16_t*)&BufferCtl.buff[0], AUDIO_OUT_BUFFER_SIZE/2);
+          uint32_t mono_samples = bytesread / sizeof(int16_t);
+          MonoToStereo(mono_temp, (int16_t*)BufferCtl.buff, mono_samples);
+          uint32_t stereo_samples = mono_samples * 2; /* L+R pairs */
+          uint32_t stereo_bytes = stereo_samples * sizeof(int16_t); /* 8192 bytes */
+          printf("PLAY_START: mono_samples=%lu stereo_samples=%lu stereo_bytes=%lu\r\n",
+                 mono_samples, stereo_samples, stereo_bytes);
+          BSP_AUDIO_OUT_Play((uint16_t*)BufferCtl.buff, stereo_bytes);
           BufferCtl.fptr = bytesread;
           return AUDIO_ERROR_NONE;
         }
@@ -259,31 +290,28 @@ AUDIO_ErrorTypeDef playProcess(void)
 
     if(BufferCtl.state == BUFFER_OFFSET_HALF)
     {
-
-      if(f_read(&SDFile,
-                &BufferCtl.buff[0],
-                AUDIO_OUT_BUFFER_SIZE/2,
-                (void *)&bytesread) != FR_OK)
+      uint32_t mono_bytes = AUDIO_OUT_BUFFER_SIZE / 4; /* 2048 bytes mono = 1024 samples */
+      if(f_read(&SDFile, mono_temp, mono_bytes, (void *)&bytesread) != FR_OK)
       {
         BSP_AUDIO_OUT_Stop(CODEC_PDWN_SW);
         return AUDIO_ERROR_IO;
       }
+      uint32_t mono_samples = bytesread / sizeof(int16_t);
+      MonoToStereo(mono_temp, (int16_t*)&BufferCtl.buff[0], mono_samples);
       BufferCtl.state = BUFFER_OFFSET_NONE;
       BufferCtl.fptr += bytesread;
     }
 
     if(BufferCtl.state == BUFFER_OFFSET_FULL)
     {
-
-      if(f_read(&SDFile,
-                &BufferCtl.buff[AUDIO_OUT_BUFFER_SIZE/2],
-                AUDIO_OUT_BUFFER_SIZE/2,
-                (void *)&bytesread) != FR_OK)
+      uint32_t mono_bytes = AUDIO_OUT_BUFFER_SIZE / 4; /* 2048 bytes mono = 1024 samples */
+      if(f_read(&SDFile, mono_temp, mono_bytes, (void *)&bytesread) != FR_OK)
       {
         BSP_AUDIO_OUT_Stop(CODEC_PDWN_SW);
         return AUDIO_ERROR_IO;
       }
-
+      uint32_t mono_samples = bytesread / sizeof(int16_t);
+      MonoToStereo(mono_temp, (int16_t*)&BufferCtl.buff[AUDIO_OUT_BUFFER_SIZE / 2], mono_samples);
       BufferCtl.state = BUFFER_OFFSET_NONE;
       BufferCtl.fptr += bytesread;
     }
@@ -293,6 +321,9 @@ AUDIO_ErrorTypeDef playProcess(void)
     if(prev_elapsed_time != elapsed_time)
     {
       prev_elapsed_time = elapsed_time;
+      printf("PLAY_RATE: fptr=%lu elapsed_sec=%lu est_Bps=%lu\r\n",
+             BufferCtl.fptr, elapsed_time,
+             (elapsed_time ? BufferCtl.fptr / elapsed_time : 0));
     }
   return audio_error;
 }
@@ -310,13 +341,19 @@ void BSP_AUDIO_OUT_HalfTransfer_CallBack(void)
 
 AUDIO_ErrorTypeDef playStop(void)
 {
+  uint32_t play_ms = HAL_GetTick() - play_t0;
+  printf("PLAY_REAL: ms=%lu file_bytes=%lu expected_ms=%lu\r\n",
+         play_ms,
+         WaveReadFormat.FileSize,
+         WaveReadFormat.ByteRate ? (1000UL * WaveReadFormat.FileSize / WaveReadFormat.ByteRate) : 0);
+
   AudioState = AUDIO_STATE_STOP;
   FilePos = 0;
 
   BSP_AUDIO_OUT_Stop(CODEC_PDWN_SW);
   f_close(&SDFile);
 
-  printf("selesai play\n");
+  printf("selesai play\r\n");
   serialPrintln(&vcp,"selesai play");
   return AUDIO_ERROR_NONE;
 }

@@ -666,6 +666,10 @@ __weak void BSP_AUDIO_OUT_ClockConfig(SAI_HandleTypeDef *hsai, uint32_t AudioFre
     rcc_ex_clk_init_struct.PLLI2S.PLLI2SQ = 2;
     rcc_ex_clk_init_struct.PLLI2SDivQ = 19;
     
+    printf("BSP_CLK: AudioFreq=%lu PLLI2SN=%u PLLI2SQ=%u DivQ=%u\r\n",
+           AudioFreq, rcc_ex_clk_init_struct.PLLI2S.PLLI2SN,
+           rcc_ex_clk_init_struct.PLLI2S.PLLI2SQ, rcc_ex_clk_init_struct.PLLI2SDivQ);
+
     HAL_RCCEx_PeriphCLKConfig(&rcc_ex_clk_init_struct);
     
   }
@@ -681,6 +685,10 @@ __weak void BSP_AUDIO_OUT_ClockConfig(SAI_HandleTypeDef *hsai, uint32_t AudioFre
     rcc_ex_clk_init_struct.PLLI2S.PLLI2SQ = 7;
     rcc_ex_clk_init_struct.PLLI2SDivQ = 1;
     
+    printf("BSP_CLK: AudioFreq=%lu PLLI2SN=%u PLLI2SQ=%u DivQ=%u\r\n",
+           AudioFreq, rcc_ex_clk_init_struct.PLLI2S.PLLI2SN,
+           rcc_ex_clk_init_struct.PLLI2S.PLLI2SQ, rcc_ex_clk_init_struct.PLLI2SDivQ);
+
     HAL_RCCEx_PeriphCLKConfig(&rcc_ex_clk_init_struct);
   }
 }

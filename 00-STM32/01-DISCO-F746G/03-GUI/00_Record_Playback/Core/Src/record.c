@@ -7,6 +7,9 @@
 
 #include "record.h"
 
+volatile uint32_t rec_half_cb = 0;
+volatile uint32_t rec_full_cb = 0;
+
 
 #define BUF_SIZE AUDIO_IN_PCM_BUFFER_SIZE
 
@@ -128,6 +131,13 @@ static uint32_t WavProcess_EncInit(uint32_t Freq, uint8_t *pHeader)
   WaveFormat.BlockAlign = WaveFormat.NbrChannels * \
                          (WaveFormat.BitPerSample/8); /* channels * bits/sample / 8 */
 
+  printf("REC_HDR: SR=%lu BR=%lu BA=%u BPS=%u CH=%u\r\n",
+         WaveFormat.SampleRate,
+         WaveFormat.ByteRate,
+         WaveFormat.BlockAlign,
+         WaveFormat.BitPerSample,
+         WaveFormat.NbrChannels);
+
   /* Parse the wav file header and extract required information */
   if(WavProcess_HeaderInit(pHeader, &WaveFormat))
   {
@@ -224,13 +234,24 @@ AUDIO_ErrorTypeDef recordProcess()
 
 	if (BufferCtl.wr_state == BUFFER_FULL)
 	{
-		for(int i = 0; i < AUDIO_IN_PCM_BUFFER_SIZE/2; i ++)
+		const uint32_t raw_hw = AUDIO_IN_PCM_BUFFER_SIZE / 2;     // 4608 halfwords per callback
+		const uint32_t extracted_samples = raw_hw / 4;            // 1152 valid mono samples
+		const uint32_t write_bytes = extracted_samples * sizeof(uint16_t); // 2304 bytes
+
+		for (uint32_t i = 0; i < extracted_samples; i++)
 		{
-			buffer[i] =  BufferCtl.pcm_buff[BufferCtl.offset + i*4];
+		    buffer[i] = BufferCtl.pcm_buff[BufferCtl.offset + i * 4];
 		}
 
+		printf("REC_IDX: offset=%lu max_used=%lu raw_end=%lu extracted=%lu write_bytes=%lu\r\n",
+		       BufferCtl.offset,
+		       BufferCtl.offset + (extracted_samples - 1) * 4,
+		       BufferCtl.offset + raw_hw - 1,
+		       extracted_samples,
+		       write_bytes);
+
 		/* write buffer in file */
-		res = f_write(&SDFile, (uint16_t*)(buffer),AUDIO_IN_PCM_BUFFER_SIZE/2,(void*)&byteswritten);
+		res = f_write(&SDFile, buffer, write_bytes, (void *)&byteswritten);
 		if(res != FR_OK)
 		{
 			printf("cannot store data, code error : %d\n",res);
@@ -245,6 +266,12 @@ AUDIO_ErrorTypeDef recordProcess()
 	if(prev_elapsed_time != elapsed_time)
 	{
 	  prev_elapsed_time = elapsed_time;
+	  uint32_t dh = rec_half_cb;
+	  uint32_t df = rec_full_cb;
+	  printf("REC_CBS: half=%lu full=%lu total=%lu\r\n", dh, df, dh + df);
+	  printf("REC_RATE: bytes_written=%lu elapsed_sec=%lu eff_Bps=%lu\r\n",
+	         BufferCtl.fptr, elapsed_time,
+	         (elapsed_time ? BufferCtl.fptr / elapsed_time : 0));
 	}
 
 	return (AUDIO_ERROR_NONE);
@@ -274,12 +301,12 @@ AUDIO_ErrorTypeDef recordStop()
 		res = f_write(&SDFile, pHeaderBuff, sizeof(WAVE_FormatTypeDef), (void*)&byteswritten);
 		if(res != FR_OK)
 		{
-			printf("cannot end file, code error : %d\n",res);
+			printf("cannot end file\r\n",res);
 			serialPrintln(&vcp, "cannot end file, code error : %d",res);
 		}
 		else
 		{
-			printf("end of file\n",res);
+			printf("end of file\r\n");
 			serialPrintln(&vcp, "end of file",res);
 		}
     }
@@ -288,7 +315,7 @@ AUDIO_ErrorTypeDef recordStop()
 
     HAL_GPIO_WritePin(GPIOI, GPIO_PIN_1, RESET);
 
-    printf("recording success\n");
+    printf("recording success\r\n");
     serialPrintln(&vcp, "recording success");
 
     return (AUDIO_ERROR_NONE);
@@ -296,6 +323,7 @@ AUDIO_ErrorTypeDef recordStop()
 
 void BSP_AUDIO_IN_HalfTransfer_CallBack(void)
 {
+	rec_half_cb++;
 	BufferCtl.wr_state = BUFFER_FULL;
 	BufferCtl.offset = 0;
 
@@ -303,6 +331,7 @@ void BSP_AUDIO_IN_HalfTransfer_CallBack(void)
 
 void BSP_AUDIO_IN_TransferComplete_CallBack(void)
 {
+	rec_full_cb++;
 	BufferCtl.wr_state = BUFFER_FULL;
 	BufferCtl.offset = AUDIO_IN_PCM_BUFFER_SIZE;
 }

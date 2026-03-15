@@ -49,13 +49,13 @@ void roleInit()
 	/*init library serial*/
 	serialInit(&vcp,USART1,usart1_buffer, sizeof(usart1_buffer));
 
-	printf("mount logical drive and create a FAT volume\n");
+	printf("mount logical drive and create a FAT volume\r\n");
 	serialPrintln(&vcp,"mount logical drive and create a FAT volume");
 	/*Mount a logical drive*/
 	res = f_mount(&SDFatFS, (TCHAR const*)SDPath, 0);
 	if(res != FR_OK)
 	{
-		printf("error mount, code error : %d\n",res);
+		printf("error mount, code error : %d\r\n",res);
 	  serialPrintln(&vcp,"error mount, code error : %d",res);
 	}
 //	else
@@ -79,6 +79,8 @@ void roleInit()
 void roleNode()
 {
 	char buf[25];
+	int k = 0;
+	int l = 0;
 	switch(role)
 	{
 	case RECORD_START:
@@ -93,18 +95,25 @@ void roleNode()
 		HAL_Delay(1000);
 		break;
 	case RECORD_PROCESS:
-		BSP_LCD_Clear(LCD_COLOR_BLACK);
-		BSP_LCD_SetTextColor(LCD_COLOR_RED);
-		sprintf(buf, "(State: RECORD_PROCESS)");
-		BSP_LCD_DisplayStringAt(0,125,(uint8_t*)buf,LEFT_MODE);
-
-		if(recordProcess() == AUDIO_ERROR_EOF)
+		if (k == 0)
 		{
 			BSP_LCD_Clear(LCD_COLOR_BLACK);
 			BSP_LCD_SetTextColor(LCD_COLOR_RED);
-			sprintf(buf, "(State: RECORD_START_if)");
+			sprintf(buf, "(State: RECORD_PROCESS)");
 			BSP_LCD_DisplayStringAt(0,125,(uint8_t*)buf,LEFT_MODE);
+			k++;
+		}
 
+		if(recordProcess() == AUDIO_ERROR_EOF)
+		{
+			if (l == 0)
+			{
+				BSP_LCD_Clear(LCD_COLOR_BLACK);
+				BSP_LCD_SetTextColor(LCD_COLOR_RED);
+				sprintf(buf, "(State: RECORD_START_if)");
+				BSP_LCD_DisplayStringAt(0,125,(uint8_t*)buf,LEFT_MODE);
+				l++;
+			}
 			role = RECORD_STOP;
 		}
 		break;
