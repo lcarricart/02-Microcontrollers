@@ -4,7 +4,6 @@
  *  Created on: Sep 17, 2022
  *      Author: HP
  */
-
 #include "role.h"
 #include "stm32746g_discovery_lcd.h"
 #include "stm32746g_discovery_ts.h"
@@ -50,11 +49,13 @@ void roleInit()
 	/*init library serial*/
 	serialInit(&vcp,USART1,usart1_buffer, sizeof(usart1_buffer));
 
+	printf("mount logical drive and create a FAT volume\n");
 	serialPrintln(&vcp,"mount logical drive and create a FAT volume");
 	/*Mount a logical drive*/
 	res = f_mount(&SDFatFS, (TCHAR const*)SDPath, 0);
 	if(res != FR_OK)
 	{
+		printf("error mount, code error : %d\n",res);
 	  serialPrintln(&vcp,"error mount, code error : %d",res);
 	}
 //	else
@@ -63,6 +64,7 @@ void roleInit()
 //		res = f_mkfs((TCHAR const*)SDPath, FM_ANY, 0, rtext, sizeof(rtext));
 //		if(res != FR_OK)
 //		{
+//			printf("error mkfs, code error : %d\n",res);
 //			serialPrintln(&vcp,"error mkfs, code error : %d",res);
 //		}
 //	}
@@ -83,17 +85,35 @@ void roleNode()
 		recordStart();
 		BSP_LCD_Clear(LCD_COLOR_BLACK);
 		BSP_LCD_SetTextColor(LCD_COLOR_RED);
-		sprintf(buf, "(Testing the display)");
+		sprintf(buf, "(State: RECORD_START)");
 		BSP_LCD_DisplayStringAt(0,125,(uint8_t*)buf,LEFT_MODE);
 		sprintf(buf, "Recording...!");
 		BSP_LCD_DisplayStringAt(0,175,(uint8_t*)buf,LEFT_MODE);
 		role = RECORD_PROCESS;
+		HAL_Delay(1000);
 		break;
 	case RECORD_PROCESS:
+		BSP_LCD_Clear(LCD_COLOR_BLACK);
+		BSP_LCD_SetTextColor(LCD_COLOR_RED);
+		sprintf(buf, "(State: RECORD_PROCESS)");
+		BSP_LCD_DisplayStringAt(0,125,(uint8_t*)buf,LEFT_MODE);
+
 		if(recordProcess() == AUDIO_ERROR_EOF)
+		{
+			BSP_LCD_Clear(LCD_COLOR_BLACK);
+			BSP_LCD_SetTextColor(LCD_COLOR_RED);
+			sprintf(buf, "(State: RECORD_START_if)");
+			BSP_LCD_DisplayStringAt(0,125,(uint8_t*)buf,LEFT_MODE);
+
 			role = RECORD_STOP;
+		}
 		break;
 	case RECORD_STOP:
+		BSP_LCD_Clear(LCD_COLOR_BLACK);
+		BSP_LCD_SetTextColor(LCD_COLOR_RED);
+		sprintf(buf, "(State: RECORD_STOP)");
+		BSP_LCD_DisplayStringAt(0,125,(uint8_t*)buf,LEFT_MODE);
+
 		recordStop();
 		role = PLAY_START;
 		break;

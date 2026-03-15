@@ -175,10 +175,12 @@ AUDIO_ErrorTypeDef recordStart()
 	res = f_open(&SDFile, REC_WAVE_NAME, FA_CREATE_ALWAYS | FA_WRITE);
 	if( res != FR_OK)
 	{
+		printf("cannot open file, code error : %d \n",res);
 		serialPrintln(&vcp,"cannot open file, code error : %d",res);
 	}
 	else
 	{
+		printf("open file\n");
 		serialPrintln(&vcp,"open file");
 		/* Initialize header file */
 		WavProcess_EncInit(DEFAULT_AUDIO_IN_FREQ, pHeaderBuff);
@@ -188,6 +190,7 @@ AUDIO_ErrorTypeDef recordStart()
 		{
 			if(byteswritten != 0)
 			{
+				printf("start record\n");
 			  serialPrintln(&vcp,"start record");
 
 			  BSP_AUDIO_IN_Init(DEFAULT_AUDIO_IN_FREQ, DEFAULT_AUDIO_IN_BIT_RESOLUTION, 1);
@@ -230,6 +233,7 @@ AUDIO_ErrorTypeDef recordProcess()
 		res = f_write(&SDFile, (uint16_t*)(buffer),AUDIO_IN_PCM_BUFFER_SIZE/2,(void*)&byteswritten);
 		if(res != FR_OK)
 		{
+			printf("cannot store data, code error : %d\n",res);
 			serialPrintln(&vcp, "cannot store data, code error : %d",res);
 		}
 		BufferCtl.fptr += byteswritten;
@@ -259,6 +263,7 @@ AUDIO_ErrorTypeDef recordStop()
     res = f_lseek(&SDFile, 0);
     if(res != FR_OK)
     {
+    	printf("f_lseek error, code error : %d\n",res);
     	serialPrintln(&vcp, "f_lseek error, code error : %d",res);
     }
     else
@@ -269,10 +274,12 @@ AUDIO_ErrorTypeDef recordStop()
 		res = f_write(&SDFile, pHeaderBuff, sizeof(WAVE_FormatTypeDef), (void*)&byteswritten);
 		if(res != FR_OK)
 		{
+			printf("cannot end file, code error : %d\n",res);
 			serialPrintln(&vcp, "cannot end file, code error : %d",res);
 		}
 		else
 		{
+			printf("end of file\n",res);
 			serialPrintln(&vcp, "end of file",res);
 		}
     }
@@ -281,6 +288,7 @@ AUDIO_ErrorTypeDef recordStop()
 
     HAL_GPIO_WritePin(GPIOI, GPIO_PIN_1, RESET);
 
+    printf("recording success\n");
     serialPrintln(&vcp, "recording success");
 
     return (AUDIO_ERROR_NONE);

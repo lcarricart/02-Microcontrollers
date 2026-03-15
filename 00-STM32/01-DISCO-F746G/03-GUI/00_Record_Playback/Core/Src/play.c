@@ -71,10 +71,12 @@ FRESULT AUDIO_StorageParse(void)
   }
   else
   {
+  	printf("cannot open dir : %d \n",res);
 	  serialPrintln(&vcp,  "cannot open dir : %d",res);
 
   }
   NumObs = FileList.ptr;
+  printf("NumbObs : %d\n",NumObs);
   serialPrintln(&vcp,"NumbObs : %d",NumObs);
   f_closedir(&dir);
   return res;
@@ -157,8 +159,7 @@ static AUDIO_ErrorTypeDef GetFileInfo(uint16_t file_idx, WAVE_FormatTypeDef *inf
     /* Fill the buffer to Send */
     if(f_read(&SDFile, info, sizeof(WaveReadFormat), (void *)&bytesread) == FR_OK)
     {
-
-      return AUDIO_ERROR_NONE;
+            return AUDIO_ERROR_NONE;
     }
     f_close(&SDFile);
   }
@@ -178,6 +179,8 @@ AUDIO_ErrorTypeDef AUDIO_PLAYER_Start(uint8_t idx)
 
 
     /*Adjust the Audio frequency */
+    printf("Audio: WAV SampleRate=%lu, ByteRate=%lu, FileSize=%lu\n", 
+           WaveReadFormat.SampleRate, WaveReadFormat.ByteRate, WaveReadFormat.FileSize);
     PlayerInit(WaveReadFormat.SampleRate);
 
     BufferCtl.state = BUFFER_OFFSET_NONE;
@@ -206,25 +209,37 @@ AUDIO_ErrorTypeDef AUDIO_PLAYER_Start(uint8_t idx)
 
 AUDIO_ErrorTypeDef playStart(int index)
 {
-	int res;
+	FRESULT res;
+	uint8_t wav_res;
+	AUDIO_ErrorTypeDef ares;
+
+	printf("init play\n");
 	serialPrintln(&vcp,"init play");
-	res = f_mount(&SDFatFS, (TCHAR const*)SDPath, 0);
+	res = f_mount(&SDFatFS, (TCHAR const*)SDPath, 1);
 	if(res != FR_OK)
 	{
+		printf("error mount, code error : %d\n",res);
 	  serialPrintln(&vcp,"error mount, code error : %d",res);
+	  return AUDIO_ERROR_IO;
 	}
 
-	AUDIO_ShowWavFiles();
+	wav_res = AUDIO_ShowWavFiles();
+	if (wav_res != 0)
+	{
+			printf("AUDIO_ShowWavFiles failed: %u\n", wav_res);
+			serialPrintln(&vcp, "AUDIO_ShowWavFiles failed: %u", wav_res);
+			return AUDIO_ERROR_IO;
+	}
 
-	res = AUDIO_PLAYER_Start(index);
-	if(res != AUDIO_ERROR_NONE)
+	ares = AUDIO_PLAYER_Start(index);
+	if(ares != AUDIO_ERROR_NONE)
 	{
-	  serialPrintln(&vcp,"error start audio : %d",res);
+		printf("error start audio : %d\n",ares);
+	  serialPrintln(&vcp,"error start audio : %d",ares);
 	}
-	else
-	{
-		serialPrintln(&vcp,"audio start gaes");
-	}
+
+	printf("audio start gaes\n");
+	serialPrintln(&vcp,"audio start gaes");
 
 	return (AUDIO_ERROR_NONE);
 }
@@ -301,6 +316,7 @@ AUDIO_ErrorTypeDef playStop(void)
   BSP_AUDIO_OUT_Stop(CODEC_PDWN_SW);
   f_close(&SDFile);
 
+  printf("selesai play\n");
   serialPrintln(&vcp,"selesai play");
   return AUDIO_ERROR_NONE;
 }

@@ -10,8 +10,8 @@
   ******************************************************************************
   * @remarks
   * 	- For some reason the app does not leave the RECORD_START state. GitHub repo
-  * 	  says this could be due to an unrecognized SD card. I doubt it but it could
-  * 	  be.
+  * 	says this could be due to an unrecognized SD card. I doubt it but it could
+  * 	be.
   ******************************************************************************
   */
 /* USER CODE END Header */
@@ -24,6 +24,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include <stdio.h>
 #include "role.h"
 /* USER CODE END Includes */
 
@@ -1681,6 +1682,17 @@ void Error_Handler(void)
   {
   }
   /* USER CODE END Error_Handler_Debug */
+}
+
+int _write(int file, char *ptr, int len)
+{
+	int DataIdx;
+
+	for (DataIdx = 0; DataIdx < len; DataIdx++)
+	{
+		ITM_SendChar(*ptr++);
+	}
+	return len;
 }
 
 #ifdef  USE_FULL_ASSERT
