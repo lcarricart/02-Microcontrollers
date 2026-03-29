@@ -479,3 +479,4 @@ obj/
 *.log
 *.bak
 *.tmp
+*.xml
