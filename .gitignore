@@ -479,4 +479,4 @@ obj/
 *.log
 *.bak
 *.tmp
-*.xml
+*.settings.xml
