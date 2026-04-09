@@ -1,11 +1,16 @@
-/*
- * Copyright (c) 2013 - 2015, Freescale Semiconductor, Inc.
- * Copyright 2016-2017, 2024 NXP
- * All rights reserved.
- *
- * SPDX-License-Identifier: BSD-3-Clause
- */
-
+/**
+  *************************************************************************************
+  * @file           : hello_world.c
+  * @brief          : Main program body
+  *************************************************************************************
+  * @description
+  * Hello World program that prints "Pressed letter = (...)" in the Serial Terminal
+  *************************************************************************************
+  * @remarks
+  * In order to open the Serial Terminal do Window > Show View > Others > Terminal
+  * Choose the port to which your MCU is connected and match the Baud rate (115200)
+  *************************************************************************************
+  */
 #include "fsl_device_registers.h"
 #include "fsl_debug_console.h"
 #include "board.h"
