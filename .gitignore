@@ -480,4 +480,4 @@ obj/
 *.bak
 *.tmp
 *.settings.xml
-*.settings/
+*.settings/**
