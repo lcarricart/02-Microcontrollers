@@ -479,5 +479,6 @@ obj/
 *.log
 *.bak
 *.tmp
+**/.settings/
 **/*.settings/
 *.settings.xml
