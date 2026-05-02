@@ -7,6 +7,9 @@
   * Example code provided by NXP's board SDK to connect to an MQTT broker via
   * WiFi, sending subscribing to a topic, sending messages to it, and receiving
   * them yourself too.
+  * 
+  * An additional C++ layer is added on top of the existing C code that implements
+  * HAL functions, RTOS, lightweight Ip, and MQTT client.
   ******************************************************************************
   * @remarks
   *     - This requires Internet connectivity (configurable fields to connect to
@@ -17,6 +20,19 @@
   *     - This broker can be changed by modifying the values
   *         - EXAMPLE_MQTT_SERVER_HOST
   *         - EXAMPLE_MQTT_SERVER_PORT
+  ******************************************************************************
+  * @c++ portability
+  * Steps for the integration:
+  *     - Check the arm-none-eabi-gcc toolchain. I will likely need the arm-none-eabi-g++
+  *     - Start by adding a trivial .cpp to test that the compiler works as expected
+  *     - Appropiate use of <extern "C" { }>. It should wrap my cpp source and header
+  *       so that C files can properly call my C++ code.
+  * 
+  * Proposed project structure:
+  * SDK / board / drivers       --> stays C
+  * MQTT connection code        --> mostly stays C initially
+  * C bridge layer              --> exposes simple functions
+  * C++ application layer       --> owns your logic/classes/state machines
   ******************************************************************************
   */
 /*******************************************************************************
