@@ -37,14 +37,16 @@ void configure_pins() {
     SYSCTL_RCGCGPIO_R       |= (1 << 9);    // Port K
     SYSCTL_RCGCGPIO_R       |= (1 << 10);   // Port L
     
-    /* TODO: set a while loop until the clock ready register is set */
+    /* TODO: set a while loop until the clock ready register is set. This is just a quick non-deterministic workaround */
     wait(2000);
 
     /* Enable, Direction, and Data registers for each port */
+    /* Pins K0, K1 and K2 */
     GPIO_PORTK_DEN_R        |= 0x07;         // digital I/O enable pin PK1
     GPIO_PORTK_DIR_R        |= 0x07;         // set PortK Output
     GPIO_PORTK_DATA_R        = 0x00;         // Initialize to zero
 
+    /* Pins L0 and L1 */
     GPIO_PORTL_DEN_R        |= 0x03;         // digital I/O enable pin PL1
     GPIO_PORTL_DIR_R        |= 0x00;         // set PortL Input
     GPIO_PORTL_DATA_R        = 0x00;         // Initialize the values
