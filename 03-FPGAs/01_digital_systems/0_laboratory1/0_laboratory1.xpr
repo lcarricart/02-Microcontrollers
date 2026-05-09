@@ -4,10 +4,10 @@
 <!-- Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.                   -->
 <!-- Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.   -->
 
-<Project Product="Vivado" Version="7" Minor="67" Path="C:/Users/luchi/source/repos/lcarricart/02-Microcontrollers/03-FPGAs/01_digital_systems/laboratory1/laboratory1.xpr">
+<Project Product="Vivado" Version="7" Minor="67" Path="C:/Users/luchi/source/repos/lcarricart/02-Microcontrollers/03-FPGAs/01_digital_systems/0_laboratory1/0_laboratory1.xpr">
   <DefaultLaunch Dir="$PRUNDIR"/>
   <Configuration>
-    <Option Name="Id" Val="2b6fc11147d64455a601dfc29bc99b39"/>
+    <Option Name="Id" Val="ba58d288b7414c1e9a9037c3e87ed95c"/>
     <Option Name="Part" Val="xc7a100tcsg324-2L"/>
     <Option Name="CompiledLibDir" Val="$PCACHEDIR/compile_simlib"/>
     <Option Name="CompiledLibDirXSim" Val=""/>
@@ -90,50 +90,66 @@
   <FileSets Version="1" Minor="32">
     <FileSet Name="sources_1" Type="DesignSrcs" RelSrcDir="$PSRCDIR/sources_1" RelGenDir="$PGENDIR/sources_1">
       <Filter Type="Srcs"/>
-      <File Path="$PPRDIR/../../../../../../../Desktop/Lucho/Education/HAW-Hamburg/4th Semester/Digital Systems/DS_Lab01_SyncSerialCommunication_SourceCode-20260503/DS_Lab01_SyncSerialCommunication_SourceCode/VHDL/AUDIO_CDC_FSM.vhd">
+      <File Path="$PSRCDIR/sources_1/imports/VHDL/AUDIO_CDC_FSM.vhd">
         <FileInfo>
+          <Attr Name="ImportPath" Val="$PPRDIR/../../../../../../../Desktop/Lucho/Education/HAW-Hamburg/4th Semester/Digital Systems/DS_Lab01_SyncSerialCommunication_SourceCode-20260503/DS_Lab01_SyncSerialCommunication_SourceCode/VHDL/AUDIO_CDC_FSM.vhd"/>
+          <Attr Name="ImportTime" Val="1777830846"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../../../../Desktop/Lucho/Education/HAW-Hamburg/4th Semester/Digital Systems/DS_Lab01_SyncSerialCommunication_SourceCode-20260503/DS_Lab01_SyncSerialCommunication_SourceCode/VHDL/AUDIO_CODEC_COM.vhd">
+      <File Path="$PSRCDIR/sources_1/imports/VHDL/AUDIO_CODEC_COM.vhd">
         <FileInfo>
+          <Attr Name="ImportPath" Val="$PPRDIR/../../../../../../../Desktop/Lucho/Education/HAW-Hamburg/4th Semester/Digital Systems/DS_Lab01_SyncSerialCommunication_SourceCode-20260503/DS_Lab01_SyncSerialCommunication_SourceCode/VHDL/AUDIO_CODEC_COM.vhd"/>
+          <Attr Name="ImportTime" Val="1777830846"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../../../../Desktop/Lucho/Education/HAW-Hamburg/4th Semester/Digital Systems/DS_Lab01_SyncSerialCommunication_SourceCode-20260503/DS_Lab01_SyncSerialCommunication_SourceCode/VHDL/AUDIO_PROCESSING_DUMMY.vhd">
+      <File Path="$PSRCDIR/sources_1/imports/VHDL/AUDIO_PROCESSING_DUMMY.vhd">
         <FileInfo>
+          <Attr Name="ImportPath" Val="$PPRDIR/../../../../../../../Desktop/Lucho/Education/HAW-Hamburg/4th Semester/Digital Systems/DS_Lab01_SyncSerialCommunication_SourceCode-20260503/DS_Lab01_SyncSerialCommunication_SourceCode/VHDL/AUDIO_PROCESSING_DUMMY.vhd"/>
+          <Attr Name="ImportTime" Val="1777830846"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../../../../Desktop/Lucho/Education/HAW-Hamburg/4th Semester/Digital Systems/DS_Lab01_SyncSerialCommunication_SourceCode-20260503/DS_Lab01_SyncSerialCommunication_SourceCode/VHDL/CODEC_CLK_GEN.vhd">
+      <File Path="$PSRCDIR/sources_1/imports/VHDL/CODEC_CLK_GEN.vhd">
         <FileInfo>
+          <Attr Name="ImportPath" Val="$PPRDIR/../../../../../../../Desktop/Lucho/Education/HAW-Hamburg/4th Semester/Digital Systems/DS_Lab01_SyncSerialCommunication_SourceCode-20260503/DS_Lab01_SyncSerialCommunication_SourceCode/VHDL/CODEC_CLK_GEN.vhd"/>
+          <Attr Name="ImportTime" Val="1777830846"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../../../../Desktop/Lucho/Education/HAW-Hamburg/4th Semester/Digital Systems/DS_Lab01_SyncSerialCommunication_SourceCode-20260503/DS_Lab01_SyncSerialCommunication_SourceCode/VHDL/FRQ_PRE_DIV.vhd">
+      <File Path="$PSRCDIR/sources_1/imports/VHDL/FRQ_PRE_DIV.vhd">
         <FileInfo>
+          <Attr Name="ImportPath" Val="$PPRDIR/../../../../../../../Desktop/Lucho/Education/HAW-Hamburg/4th Semester/Digital Systems/DS_Lab01_SyncSerialCommunication_SourceCode-20260503/DS_Lab01_SyncSerialCommunication_SourceCode/VHDL/FRQ_PRE_DIV.vhd"/>
+          <Attr Name="ImportTime" Val="1777830846"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../../../../Desktop/Lucho/Education/HAW-Hamburg/4th Semester/Digital Systems/DS_Lab01_SyncSerialCommunication_SourceCode-20260503/DS_Lab01_SyncSerialCommunication_SourceCode/VHDL/PAR_TO_SER_LR_DUMMY.vhd">
+      <File Path="$PSRCDIR/sources_1/imports/VHDL/PAR_TO_SER_LR_DUMMY.vhd">
         <FileInfo>
+          <Attr Name="ImportPath" Val="$PPRDIR/../../../../../../../Desktop/Lucho/Education/HAW-Hamburg/4th Semester/Digital Systems/DS_Lab01_SyncSerialCommunication_SourceCode-20260503/DS_Lab01_SyncSerialCommunication_SourceCode/VHDL/PAR_TO_SER_LR_DUMMY.vhd"/>
+          <Attr Name="ImportTime" Val="1777845756"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../../../../Desktop/Lucho/Education/HAW-Hamburg/4th Semester/Digital Systems/DS_Lab01_SyncSerialCommunication_SourceCode-20260503/DS_Lab01_SyncSerialCommunication_SourceCode/VHDL/SER_TO_PAR_LR.vhd">
+      <File Path="$PSRCDIR/sources_1/imports/VHDL/SER_TO_PAR_LR.vhd">
         <FileInfo>
+          <Attr Name="ImportPath" Val="$PPRDIR/../../../../../../../Desktop/Lucho/Education/HAW-Hamburg/4th Semester/Digital Systems/DS_Lab01_SyncSerialCommunication_SourceCode-20260503/DS_Lab01_SyncSerialCommunication_SourceCode/VHDL/SER_TO_PAR_LR.vhd"/>
+          <Attr Name="ImportTime" Val="1777830846"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../../../../Desktop/Lucho/Education/HAW-Hamburg/4th Semester/Digital Systems/DS_Lab01_SyncSerialCommunication_SourceCode-20260503/DS_Lab01_SyncSerialCommunication_SourceCode/VHDL/AUDIO_SYSTEM_TOP.vhd">
+      <File Path="$PSRCDIR/sources_1/imports/VHDL/AUDIO_SYSTEM_TOP.vhd">
         <FileInfo>
+          <Attr Name="ImportPath" Val="$PPRDIR/../../../../../../../Desktop/Lucho/Education/HAW-Hamburg/4th Semester/Digital Systems/DS_Lab01_SyncSerialCommunication_SourceCode-20260503/DS_Lab01_SyncSerialCommunication_SourceCode/VHDL/AUDIO_SYSTEM_TOP.vhd"/>
+          <Attr Name="ImportTime" Val="1777830846"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
@@ -146,20 +162,26 @@
     </FileSet>
     <FileSet Name="constrs_1" Type="Constrs" RelSrcDir="$PSRCDIR/constrs_1" RelGenDir="$PGENDIR/constrs_1">
       <Filter Type="Constrs"/>
-      <File Path="$PPRDIR/../../../../../../../Desktop/Lucho/Education/HAW-Hamburg/4th Semester/Digital Systems/DS_Lab01_SyncSerialCommunication_SourceCode-20260503/DS_Lab01_SyncSerialCommunication_SourceCode/Constraints/Modsys_Artix7_AUDIO_Conn_3.xdc">
+      <File Path="$PSRCDIR/constrs_1/imports/Constraints/Modsys_Artix7_AUDIO_Conn_3.xdc">
         <FileInfo>
+          <Attr Name="ImportPath" Val="$PPRDIR/../../../../../../../Desktop/Lucho/Education/HAW-Hamburg/4th Semester/Digital Systems/DS_Lab01_SyncSerialCommunication_SourceCode-20260503/DS_Lab01_SyncSerialCommunication_SourceCode/Constraints/Modsys_Artix7_AUDIO_Conn_3.xdc"/>
+          <Attr Name="ImportTime" Val="1777830846"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../../../../Desktop/Lucho/Education/HAW-Hamburg/4th Semester/Digital Systems/DS_Lab01_SyncSerialCommunication_SourceCode-20260503/DS_Lab01_SyncSerialCommunication_SourceCode/Constraints/Modsys_Artix7_IOM_Conn_1.xdc">
+      <File Path="$PSRCDIR/constrs_1/imports/Constraints/Modsys_Artix7_IOM_Conn_1.xdc">
         <FileInfo>
+          <Attr Name="ImportPath" Val="$PPRDIR/../../../../../../../Desktop/Lucho/Education/HAW-Hamburg/4th Semester/Digital Systems/DS_Lab01_SyncSerialCommunication_SourceCode-20260503/DS_Lab01_SyncSerialCommunication_SourceCode/Constraints/Modsys_Artix7_IOM_Conn_1.xdc"/>
+          <Attr Name="ImportTime" Val="1777830846"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../../../../Desktop/Lucho/Education/HAW-Hamburg/4th Semester/Digital Systems/DS_Lab01_SyncSerialCommunication_SourceCode-20260503/DS_Lab01_SyncSerialCommunication_SourceCode/Constraints/Modsys_Artix7_Main_System.xdc">
+      <File Path="$PSRCDIR/constrs_1/imports/Constraints/Modsys_Artix7_Main_System.xdc">
         <FileInfo>
+          <Attr Name="ImportPath" Val="$PPRDIR/../../../../../../../Desktop/Lucho/Education/HAW-Hamburg/4th Semester/Digital Systems/DS_Lab01_SyncSerialCommunication_SourceCode-20260503/DS_Lab01_SyncSerialCommunication_SourceCode/Constraints/Modsys_Artix7_Main_System.xdc"/>
+          <Attr Name="ImportTime" Val="1777830846"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
         </FileInfo>
@@ -169,8 +191,10 @@
       </Config>
     </FileSet>
     <FileSet Name="sim_1" Type="SimulationSrcs" RelSrcDir="$PSRCDIR/sim_1" RelGenDir="$PGENDIR/sim_1">
-      <File Path="$PPRDIR/../../../../../../../Desktop/Lucho/Education/HAW-Hamburg/4th Semester/Digital Systems/DS_Lab01_SyncSerialCommunication_SourceCode-20260503/DS_Lab01_SyncSerialCommunication_SourceCode/Testbench/AUDIO_SYSTEM_TOP_TB.vhd">
+      <File Path="$PSRCDIR/sim_1/imports/Testbench/AUDIO_SYSTEM_TOP_TB.vhd">
         <FileInfo>
+          <Attr Name="ImportPath" Val="$PPRDIR/../../../../../../../Desktop/Lucho/Education/HAW-Hamburg/4th Semester/Digital Systems/DS_Lab01_SyncSerialCommunication_SourceCode-20260503/DS_Lab01_SyncSerialCommunication_SourceCode/Testbench/AUDIO_SYSTEM_TOP_TB.vhd"/>
+          <Attr Name="ImportTime" Val="1777830846"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
