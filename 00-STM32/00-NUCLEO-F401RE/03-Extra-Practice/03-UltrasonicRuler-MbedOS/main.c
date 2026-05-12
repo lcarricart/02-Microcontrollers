@@ -8,7 +8,6 @@
  * Status: Information Engineering student, HAW Hamburg, Germany.
  * Profile: https://www.linkedin.com/in/lucianocarricart/
  *******************************************************************************************************************/
-
 #include "mbed.h"
 #include "TextLCD_I2C.h"      // from pilotak/mbed-text-display
 
@@ -90,12 +89,12 @@ int main()
 
         lcd.cls();
         lcd.locate(0, 0);
-        lcd.printf("Ultrasonic App!");
+        lcd.printf("Ultrasonic App!  ");
 
         lcd.locate(0, 1);
 
         if (distance >= 0.0f) {
-            lcd.printf("Dist: %5.1f cm", distance);
+            lcd.printf("Dist: %5.1f cm  ", distance);
         }
 
         led = !led;
