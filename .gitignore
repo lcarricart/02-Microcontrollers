@@ -482,3 +482,41 @@ obj/
 **/.settings/
 **/*.settings/
 *.settings.xml
+
+@'
+# Zephyr build outputs
+build/
+build-*/
+twister-out/
+
+# CMake/Ninja generated files
+CMakeCache.txt
+CMakeFiles/
+compile_commands.json
+*.ninja
+cmake_install.cmake
+
+# Firmware artifacts
+*.elf
+*.hex
+*.bin
+*.map
+*.lst
+*.uf2
+
+# Logs/cache
+*.log
+.cache/
+
+# Local editor files
+.vscode/
+.idea/
+
+# Never commit a local Zephyr workspace if accidentally copied
+.venv/
+.west/
+zephyr/
+modules/
+bootloader/
+tools/
+'@ | Set-Content -Encoding UTF8 "$APP_REPO\.gitignore"
