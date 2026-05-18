@@ -91,7 +91,7 @@ void configure_tim0() {
     TIMER0_TBMR_R   &= ~(1 << 4);       // Count down
     TIMER0_TBMR_R   |= (1 << 2);        // Edge-time mode (opposite to counting amount of edges)
     TIMER0_ICR_R    = (1 << 10);        // GPTM Timer B Capture Mode Event Interrupt Clear
-    // TODO I may need this guy above to notify me when an event occurred
+    // TODO: I may need this guy above to notify me when an event occurred
 }
 
 /**
@@ -209,7 +209,7 @@ void trigger_ultrasonic() {
     sleep_us(15);
     GPIO_PORTD_AHB_DATA_R &= ~(1 << 6);
 
-    // TODO Shorten this once in the LAB!!
+    // TODO: Shorten this once in the LAB!!
     sleep_ms(500);
 }
 
@@ -224,5 +224,10 @@ int main(void) {
         //blink();
 
         trigger_ultrasonic();
+        /* TODO: work on the TIM0B in capture-mode to count the amount of seconds from edge to edge. 
+         * This should be fairly structured and easy, since I dont need to check when an event happened,
+         * but rather send the trigger and only then read the time recorded in the register (which
+         * register to read is still a question). I can test this feature by sending a known time with my
+         * GPIO pin and then read back the recorded time in the input pin (do I need a resistance in between?) */
     }
 }
