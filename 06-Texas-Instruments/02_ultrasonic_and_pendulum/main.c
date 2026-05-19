@@ -18,6 +18,10 @@
  *    at least 16 bits. In the TM4C129 it is 32 bits, and so (1U << 31U) works. For MISRA C safety, the correct
  *    way is (1UL << 31U) because the data type long is at least 32 bits!
  *******************************************************************************************
+ * @pinout
+ *  - PD1 echo
+ *  - PD6 trigger
+ *******************************************************************************************
  */
 
 #include "inc/tm4c1294ncpdt.h"
@@ -44,6 +48,8 @@ void sleep_ms(uint32_t ms);
 void wait(int ticks);
 
 void trigger_ultrasonic();
+uint32_t echo_read_time();
+uint32_t calculate_distance_cm(uint32_t time);
 
 /***************************** E X T R A   F U N C T I O N S *******************************/
 
@@ -71,27 +77,32 @@ void wait(int ticks) {
  *          - Start timer                   (TIMERx_CTL_R)
  */
 void configure_tim0() {
-    // TIM0A (periodic)
-    SYSCTL_RCGCTIMER_R  |= (1 << 0);    // Enable TIM0
-    while (!(SYSCTL_PRTIMER_R & (1 << 0)));
-    TIMER0_CFG_R    = 0b000;            // Select 32 bits
-    TIMER0_CTL_R    &= ~(1 << 0);       // Stop timer
-    TIMER0_TAMR_R   |= (1 << 1);        // TIM0A periodic mode
-    TIMER0_TAMR_R   &= ~(1 << 4);       // TIM0A count down
-    TIMER0_TAMR_R   |= (1 << 5);        // TIM0A match enable interrupt
-    TIMER0_ICR_R    = (1 << 4);         // Clear match flag (initialization, this will happen again later)
+    // TIM1A (periodic)
+    SYSCTL_RCGCTIMER_R  |= (1 << 1);    // Enable TIM1
+    while (!(SYSCTL_PRTIMER_R & (1 << 1)));
+    TIMER1_CFG_R    = 0b000;            // Select 32 bits (unifies TIM A and B)
+    TIMER1_CTL_R    &= ~(1 << 0);       // Stop timer
+    TIMER1_TAMR_R   |= (1 << 1);        // TIM1A periodic mode
+    TIMER1_TAMR_R   &= ~(1 << 4);       // TIM1A count down
+    TIMER1_TAMR_R   |= (1 << 5);        // TIM1A match enable interrupt
+    TIMER1_ICR_R    = (1 << 4);         // Clear match flag (initialization, this will happen again later)
 
     /* The following values are kept constant for the purpose of the application (only change match value) */
-    TIMER0_TAPR_R   = 0x00000000;       // Prescaler value = 1 - 1
+    TIMER1_TAPR_R   = 0x00000000;       // Prescaler value = 1 - 1
 
     // TIM0B (capture)
-    //TIMER0_CFG_R    = 0b000;          // Select 32 bits (to be done once only and actually before any changes to the CTL_R)
+    SYSCTL_RCGCTIMER_R  |= (1 << 0);    // Enable TIM0
+    while (!(SYSCTL_PRTIMER_R & (1 << 0)));
+    TIMER0_CFG_R    = 0b100;            // Select 16 bits to use only TIM B (to be done once only and actually before any changes to the CTL_R)
     TIMER0_CTL_R    &= ~(1 << 8);       // Stop timer
+    TIMER0_CTL_R    |= (0b11 << 10);    // Capture rising and falling edges
     TIMER0_TBMR_R   |= (0b11);          // TIM0B capture mode
     TIMER0_TBMR_R   &= ~(1 << 4);       // Count down
     TIMER0_TBMR_R   |= (1 << 2);        // Edge-time mode (opposite to counting amount of edges)
     TIMER0_ICR_R    = (1 << 10);        // GPTM Timer B Capture Mode Event Interrupt Clear
-    // TODO: I may need this guy above to notify me when an event occurred
+    
+    TIMER0_TBILR_R = 0xFFFF;            // Load value for Timer B
+    TIMER0_TBPR_R  = 0xFF;              // Optional prescaler extension (since I'm using 16 bits I want this to be as slow as possible)
 }
 
 /**
@@ -167,15 +178,15 @@ void sleep_ms(uint32_t ms) {
     steps       = ms * 16000;
     match_value = 0xFFFFFFFF - steps;
 
-    TIMER0_CTL_R        &= ~(1 << 0);   // Stop timer
-    TIMER0_TAILR_R      = 0xFFFFFFFF;   // Load value = maximum = 2^(32) - 1
-    TIMER0_TAMATCHR_R   = match_value;  // Match value
+    TIMER1_CTL_R        &= ~(1 << 0);   // Stop timer
+    TIMER1_TAILR_R      = 0xFFFFFFFF;   // Load value = maximum = 2^(32) - 1
+    TIMER1_TAMATCHR_R   = match_value;  // Match value
 
-    TIMER0_CTL_R |= (1 << 0);           // Start timer
-    while(!(TIMER0_RIS_R & (1 << 4)));  // Do nothing until match value flag is active
+    TIMER1_CTL_R |= (1 << 0);           // Start timer
+    while(!(TIMER1_RIS_R & (1 << 4)));  // Do nothing until match value flag is active
 
-    TIMER0_CTL_R &= ~(1 << 0);          // Stop timer
-    TIMER0_ICR_R = (1 << 4);            // Clear match flag (it should not be a |= because I don't wanna preserve the previous value if 1. Furthermore, with = I'm only deleting those registers where I write a 1, since the register is a W1C!!!)
+    TIMER1_CTL_R &= ~(1 << 0);          // Stop timer
+    TIMER1_ICR_R = (1 << 4);            // Clear match flag (it should not be a |= because I don't wanna preserve the previous value if 1. Furthermore, with = I'm only deleting those registers where I write a 1, since the register is a W1C!!!)
 }
 
 /**
@@ -190,15 +201,15 @@ void sleep_us(uint32_t us) {
     steps       = us * 16;
     match_value = 0xFFFFFFFF - steps;
 
-    TIMER0_CTL_R        &= ~(1 << 0);   // Stop timer
-    TIMER0_TAILR_R      = 0xFFFFFFFF;   // Load value = maximum = 2^(32) - 1
-    TIMER0_TAMATCHR_R   = match_value;  // Match value
+    TIMER1_CTL_R        &= ~(1 << 0);   // Stop timer
+    TIMER1_TAILR_R      = 0xFFFFFFFF;   // Load value = maximum = 2^(32) - 1
+    TIMER1_TAMATCHR_R   = match_value;  // Match value
 
-    TIMER0_CTL_R |= (1 << 0);           // Start timer
-    while(!(TIMER0_RIS_R & (1 << 4)));  // Do nothing until match value flag is active
+    TIMER1_CTL_R |= (1 << 0);           // Start timer
+    while(!(TIMER1_RIS_R & (1 << 4)));  // Do nothing until match value flag is active
 
-    TIMER0_CTL_R &= ~(1 << 0);          // Stop timer
-    TIMER0_ICR_R = (1 << 4);            // Clear match flag (it should not be a |= because I don't wanna preserve the previous value if 1, I wanna write)
+    TIMER1_CTL_R &= ~(1 << 0);          // Stop timer
+    TIMER1_ICR_R = (1 << 4);            // Clear match flag (it should not be a |= because I don't wanna preserve the previous value if 1, I wanna write)
 }
 
 /**
@@ -208,9 +219,55 @@ void trigger_ultrasonic() {
     GPIO_PORTD_AHB_DATA_R |= (1 << 6);
     sleep_us(15);
     GPIO_PORTD_AHB_DATA_R &= ~(1 << 6);
+}
 
-    // TODO: Shorten this once in the LAB!!
-    sleep_ms(500);
+/**
+ * @brief Send a short trigger signal and use TIM0B in capture mode to calculate the "pulse" time of the echo pin.
+ */
+uint32_t echo_read_time() {
+    uint32_t first_edge;
+    uint32_t second_edge;
+    uint32_t captured_time;
+
+    TIMER0_ICR_R = (1 << 10);               // Clea the capture event flag
+
+    TIMER0_CTL_R  |= (1 << 8);              // Start TIM0B
+
+    trigger_ultrasonic();
+
+    while(!(TIMER0_RIS_R & (1 << 10)));     // Wait for the first edge
+    first_edge = TIMER0_TBR_R;              // Read TIM0B value (result is a raw timer count value)
+    TIMER0_ICR_R = (1 << 10);               // Clear flag
+
+    while(!(TIMER0_RIS_R & (1 << 10)));     // Wait for the second edge
+    second_edge = TIMER0_TBR_R;             // Read TIM0B value (result is a raw timer count value)
+    TIMER0_ICR_R = (1 << 10);               // Clear flag
+
+    TIMER0_CTL_R  &= ~(1 << 8);             // Stop TIM0B
+
+    captured_time = first_edge - second_edge;
+    return captured_time;
+}
+
+/**
+ * @brief Calculate the distance between object and ultrasonic sensor using the time it takes for the ultrasonic wave to return to bounce back.
+ *  Steps:
+ *   - Take raw timer count value and convert to time (using clock reference, prescaler, bit width and so on)
+ *   - The time recorded is what it took for the signal to be sent and bounce back (twice the time of interest)
+ *   - From physics, distance [m] = speed [m/s] * time [s]
+ *   - For the variable speed, I'll use the speed of sound = 343 m/s
+ */
+uint32_t calculate_distance_cm(uint32_t timer_count) {
+    uint32_t time_us;
+    uint32_t half_time_us;
+    uint16_t sound_speed_cm_s = 34300;
+    uint32_t distance_cm;
+
+    time_us = timer_count / 16;
+    half_time_us = time_us / 2;
+    distance_cm = (uint32_t)(((uint64_t)sound_speed_cm_s * half_time_us) / 1000000);
+
+    return distance_cm;
 }
 
 /*******************************************************************************************/
@@ -220,14 +277,24 @@ int main(void) {
     configure_led();
     configure_trigger_echo_pins();
 
+    printf("Application start! \r\n");
+    sleep_ms(100);
+
+    uint32_t timer_count = 0;
+    uint32_t distance_cm = 0;
+    
     while(1) {
         //blink();
 
-        trigger_ultrasonic();
         /* TODO: work on the TIM0B in capture-mode to count the amount of seconds from edge to edge. 
          * This should be fairly structured and easy, since I dont need to check when an event happened,
          * but rather send the trigger and only then read the time recorded in the register (which
          * register to read is still a question). I can test this feature by sending a known time with my
          * GPIO pin and then read back the recorded time in the input pin (do I need a resistance in between?) */
+
+        timer_count = echo_read_time();
+        distance_cm = calculate_distance_cm(timer_count);
+        printf("Distance = %lu cm \r\n", distance_cm);
+        sleep_ms(1000);
     }
 }
