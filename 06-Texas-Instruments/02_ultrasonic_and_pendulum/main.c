@@ -20,7 +20,7 @@
  *******************************************************************************************
  * @pinout
  *  - PD1 echo
- *  - PD6 trigger
+ *  - PD5 trigger
  *******************************************************************************************
  */
 
@@ -37,8 +37,10 @@ typedef enum {
 
 /******************************** P R O T O T Y P E S **************************************/
 void configure_trigger_echo_pins();
-void configure_tim0();
-void configure_led();
+void configure_timers();
+void configure_internal_led();
+void configure_pendulum_leds();
+void configure_pendulum_control();
 
 void toggle_led(led_state_t state);
 void blink();
@@ -65,7 +67,7 @@ void wait(int ticks) {
 /********************** I N I T I A L   C O N F I G U R A T I O N S ************************/
 
 /**
- * @brief TIM0 A (periodic) and B (capture) peripheral configuration
+ * @brief TIM1A (periodic) and TIM0B (capture) peripheral configuration
  *          - Activate timer clock          (SYSCTL_RCGCTIMER_R)
  *          - Wait for stabilization        (SYSCTL_PRTIMER_R)
  *          - Stop timer                    (TIMERx_CTL_R)
@@ -76,8 +78,8 @@ void wait(int ticks) {
  *          - Match value                   (TIMERx_TnMATCHR_R)
  *          - Start timer                   (TIMERx_CTL_R)
  */
-void configure_tim0() {
-    // TIM1A (periodic)
+void configure_timers() {
+    // TIM1A (periodic), used by the sleep function
     SYSCTL_RCGCTIMER_R  |= (1 << 1);    // Enable TIM1
     while (!(SYSCTL_PRTIMER_R & (1 << 1)));
     TIMER1_CFG_R    = 0b000;            // Select 32 bits (unifies TIM A and B)
@@ -90,7 +92,7 @@ void configure_tim0() {
     /* The following values are kept constant for the purpose of the application (only change match value) */
     TIMER1_TAPR_R   = 0x00000000;       // Prescaler value = 1 - 1
 
-    // TIM0B (capture)
+    // TIM0B (capture), used for measuring echo time
     SYSCTL_RCGCTIMER_R  |= (1 << 0);    // Enable TIM0
     while (!(SYSCTL_PRTIMER_R & (1 << 0)));
     TIMER0_CFG_R    = 0b100;            // Select 16 bits to use only TIM B (to be done once only and actually before any changes to the CTL_R)
@@ -103,6 +105,20 @@ void configure_tim0() {
     
     TIMER0_TBILR_R = 0xFFFF;            // Load value for Timer B
     TIMER0_TBPR_R  = 0xFF;              // Optional prescaler extension (since I'm using 16 bits I want this to be as slow as possible)
+
+    // TIM3A (capture). Capture is the only option for capturing edge events
+    SYSCTL_RCGCTIMER_R  |= (1 << 3);    // Enable TIM3
+    while (!(SYSCTL_PRTIMER_R & (1 << 3)));
+    TIMER3_CFG_R    = 0b000;            // Select 32 bits (unifies TIM A and B)
+    TIMER3_CTL_R    &= ~(1 << 0);       // Stop timer
+    TIMER3_CTL_R    |= (0b11 << 2);     // Capture rising and falling edges
+    TIMER3_TAMR_R   |= (0b11);          // TIM3A capture mode
+    TIMER3_TAMR_R   &= ~(1 << 4);       // TIM3A count down
+    TIMER3_TAMR_R   |= (1 << 2);        // Edge-time mode (opposite to counting amount of edges)
+    TIMER3_ICR_R    = (1 << 2);         // GPTM Timer A Capture Mode Event Interrupt Clear
+    TIMER3_TAILR_R  = 0xFFFFFFFF;       // Load value = maximum = 2^(32) - 1. I need to do this once only, since I only wanna see events and I dont care about the count value.
+    TIMER3_TAPR_R   = 0xFF;             // Optional prescaler extension (none)
+    TIMER3_CTL_R    |= (1 << 0);        // Start timer (will stay on forever, I dont need it to stop, just capture edges)
 }
 
 /**
@@ -113,13 +129,13 @@ void configure_tim0() {
  *          - GPIO control register         (GPIO_PORTx_PCTL_R)
  */
 void configure_trigger_echo_pins() {
-    /* Configure trigger pin PD6
+    /* Configure trigger pin PD5
      * the LAB explicitly request to set the pin as a GPIO. We're making the crude implementation of this functionality.
      */
     SYSCTL_RCGCGPIO_R       |= (1 << 3);    // Clock Port D
     while (!(SYSCTL_PRGPIO_R & (1 << 3)));  // Wait for stabilization
-    GPIO_PORTD_AHB_DEN_R    |= (1 << 6);    // Enable pin 6
-    GPIO_PORTD_AHB_DIR_R    |= (1 << 6);    // Set output direction (=1)
+    GPIO_PORTD_AHB_DEN_R    |= (1 << 5);    // Enable pin 5
+    GPIO_PORTD_AHB_DIR_R    |= (1 << 5);    // Set output direction (=1)
     GPIO_PORTD_AHB_DATA_R    = 0x00;        // Set PortD Output to zero
 
     /* Configure echo pin PD1
@@ -138,7 +154,7 @@ void configure_trigger_echo_pins() {
 /**
  * @brief led configuration from LAB1
  */
-void configure_led() {
+void configure_internal_led() {
     SYSCTL_RCGCGPIO_R       |= (0x1 << 12);  // Switch on clock for Port N
     while (!(SYSCTL_PRGPIO_R & 0x1000));     // Wait for clock to stabilize
     GPIO_PORTN_DEN_R        |= (0x1 << 1);   // Digital I/O enable pin PN1
@@ -152,6 +168,28 @@ void toggle_led(led_state_t state) {
     } else {
         GPIO_PORTN_DATA_R &= ~0x02; // turn LED off
     }
+}
+
+/**
+ * @brief Configure GPIO outputs to drive the pendulum LEDs
+ */
+void configure_pendulum_leds() {
+    SYSCTL_RCGCGPIO_R       |= (1 << 11);    // Clock Port M
+    while (!(SYSCTL_PRGPIO_R & (1 << 11)));  // Wait for stabilization
+    GPIO_PORTM_DEN_R    |= 0x3F;        // Enable pins 0,1,2,3,4,5
+    GPIO_PORTM_DIR_R    |= 0x3F;        // Set output direction (=1)
+    GPIO_PORTM_DATA_R    = 0x00;        // Set PortM Output to zero
+}
+
+/**
+ * @brief Configure input pin to read the triggers of the pendulum. This needs to be clocked to TIM3.
+ */
+void configure_pendulum_control() {
+    /* Port D is already clocked from before */
+    GPIO_PORTD_AHB_AFSEL_R  |= (1 << 4);    // Activate AFSEL for pin 4
+    GPIO_PORTD_AHB_PCTL_R   |= 0x00030000;  // Use function 3 for pin 4
+    GPIO_PORTD_AHB_DEN_R    |= (1 << 4);    // Enable pin 4
+    GPIO_PORTD_AHB_DIR_R    &= ~(1 << 4);    // Set input direction (=0)
 }
 
 /**
@@ -216,9 +254,9 @@ void sleep_us(uint32_t us) {
  * @brief Send an pulse of >10us to trigger the ultrasonic sensor
  */
 void trigger_ultrasonic() {
-    GPIO_PORTD_AHB_DATA_R |= (1 << 6);
+    GPIO_PORTD_AHB_DATA_R |= (1 << 5);
     sleep_us(15);
-    GPIO_PORTD_AHB_DATA_R &= ~(1 << 6);
+    GPIO_PORTD_AHB_DATA_R &= ~(1 << 5);
 }
 
 /**
@@ -229,7 +267,7 @@ uint32_t echo_read_time() {
     uint32_t second_edge;
     uint32_t captured_time;
 
-    TIMER0_ICR_R = (1 << 10);               // Clea the capture event flag
+    TIMER0_ICR_R = (1 << 10);               // Clear the capture event flag
 
     TIMER0_CTL_R  |= (1 << 8);              // Start TIM0B
 
@@ -270,12 +308,32 @@ uint32_t calculate_distance_cm(uint32_t timer_count) {
     return distance_cm;
 }
 
+/**
+ * @brief Read the control output of the pendulum and detect an edge
+ *  Steps:
+ *   - Turn off clock
+ *   - Clear flag
+ *   - 
+ */
+void read_pendulum_control() {
+    TIMER3_ICR_R    = (1 << 2);             // GPTM Timer A Capture Mode Event Interrupt Clear
+    TIMER3_CTL_R    |= (1 << 0);            // Start timer (unnecessary but for debug)
+    GPIO_PORTM_DATA_R = 0x3F;               // Turn on LEDs
+    while(!(TIMER3_RIS_R & (1 << 2)));      // Wait for an edge
+    GPIO_PORTM_DATA_R = 0x00;               // Turn off LEDs
+    TIMER3_ICR_R    = (1 << 2);             // Clear flag
+    TIMER3_CTL_R    &= ~(1 << 0);           // Stop timer (unnecessary but for debug)
+}
+
 /*******************************************************************************************/
 
 int main(void) {
-    configure_tim0();
-    configure_led();
+    configure_timers();
+    configure_internal_led();
     configure_trigger_echo_pins();
+
+    configure_pendulum_leds();
+    configure_pendulum_control();
 
     printf("Application start! \r\n");
     sleep_ms(100);
@@ -292,9 +350,20 @@ int main(void) {
          * register to read is still a question). I can test this feature by sending a known time with my
          * GPIO pin and then read back the recorded time in the input pin (do I need a resistance in between?) */
 
+        /*
         timer_count = echo_read_time();
         distance_cm = calculate_distance_cm(timer_count);
         printf("Distance = %lu cm \r\n", distance_cm);
         sleep_ms(1000);
+        */
+
+        /*
+        GPIO_PORTM_DATA_R = 0x3F;
+        sleep_ms(100);
+        GPIO_PORTM_DATA_R = 0x00;
+        sleep_ms(100);
+        */
+
+        read_pendulum_control();
     }
 }
