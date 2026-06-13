@@ -27,7 +27,7 @@
  */
 
 #include "inc/tm4c1294ncpdt.h"
-#include "core_cm4.h" /* Include the build path ${ProjDir}/C:/ti/ccs2050/ccs/ccs_base/arm/include/CMSIS. This is where the __WFI definition resides */
+//#include "core_cm4.h" /* Include the build path ${ProjDir}/C:/ti/ccs2050/ccs/ccs_base/arm/include/CMSIS. This is where the __WFI definition lives */
 #include <stdint.h>
 #include <stdio.h>
 #include <math.h>
@@ -56,6 +56,14 @@ void trigger_ultrasonic();
 uint32_t echo_read_time();
 uint32_t calculate_distance_cm(uint32_t time);
 
+/******************************** G L O B A L S **************************************/
+uint8_t isr_counter = 0;
+uint32_t first_edge;
+uint32_t second_edge;
+uint32_t captured_time;
+
+uint8_t time_available_flag;
+uint8_t first_time_flag = 0;
 /***************************** E X T R A   F U N C T I O N S *******************************/
 
 /**
@@ -94,8 +102,9 @@ void wait(int ticks) {
  *          - Set priority level
  *
  * ISR
+ *          - Enable interrupts in your desired peripheral
+ *          - Enable the desired IRQ in the NVIC (there's a register for it)
  *          - Change the vector table to include the address of the ISR
- *
  */
 void configure_timers_and_interrupts() {
     // TIM1A (periodic), used by the sleep function
@@ -119,10 +128,15 @@ void configure_timers_and_interrupts() {
     TIMER0_TBMR_R   |= (0b11);          // TIM0B capture mode
     TIMER0_TBMR_R   &= ~(1 << 4);       // Count down
     TIMER0_TBMR_R   |= (1 << 2);        // Edge-time mode (opposite to counting amount of edges)
-    TIMER0_ICR_R    = (1 << 10);        // GPTM Timer B Capture Mode Event Interrupt Clear
+
+    // Interrupts code
+    TIMER0_IMR_R    |= (1 << 10);       // TIM0B Capture Mode Event Interrupt Mask
+    TIMER0_ICR_R    = (1 << 10);        // TIM0B Capture Mode Event Interrupt Clear
+    NVIC_EN0_R      |= (1 << 20);       // Allow NVIC to process IRQ 20 (TIM0B)
     
     TIMER0_TBILR_R = 0xFFFF;            // Load value for Timer B
     TIMER0_TBPR_R  = 0xFF;              // Optional prescaler extension (since I'm using 16 bits I want this to be as slow as possible)
+    TIMER0_CTL_R  |= (1 << 8);          // Start TIM0B 
 
     // TIM3A (capture). Capture is the only option for capturing edge events
     SYSCTL_RCGCTIMER_R  |= (1 << 3);    // Enable TIM3
@@ -278,34 +292,6 @@ void trigger_ultrasonic() {
 }
 
 /**
- * @brief Send a short trigger signal and use TIM0B in capture mode to calculate the "pulse" time of the echo pin.
- */
-uint32_t echo_read_time() {
-    uint32_t first_edge;
-    uint32_t second_edge;
-    uint32_t captured_time;
-
-    TIMER0_ICR_R = (1 << 10);               // Clear the capture event flag
-
-    TIMER0_CTL_R  |= (1 << 8);              // Start TIM0B
-
-    trigger_ultrasonic();
-
-    while(!(TIMER0_RIS_R & (1 << 10)));     // Wait for the first edge
-    first_edge = TIMER0_TBR_R;              // Read TIM0B value (result is a raw timer count value)
-    TIMER0_ICR_R = (1 << 10);               // Clear flag
-
-    while(!(TIMER0_RIS_R & (1 << 10)));     // Wait for the second edge
-    second_edge = TIMER0_TBR_R;             // Read TIM0B value (result is a raw timer count value)
-    TIMER0_ICR_R = (1 << 10);               // Clear flag
-
-    TIMER0_CTL_R  &= ~(1 << 8);             // Stop TIM0B
-
-    captured_time = first_edge - second_edge;
-    return captured_time;
-}
-
-/**
  * @brief Calculate the distance between object and ultrasonic sensor using the time it takes for the ultrasonic wave to return to bounce back.
  *  Steps:
  *   - Take raw timer count value and convert to time (using clock reference, prescaler, bit width and so on)
@@ -343,6 +329,37 @@ void read_pendulum_control() {
     TIMER3_CTL_R    &= ~(1 << 0);           // Stop timer (unnecessary but for debug)
 }
 
+/************************************ I S R *************************************************/
+/**
+* @brief Handler to operate the read functions. It's a sort of state machine that reacts differently
+* depending on how many timmes the interrupt occurred.
+* First occurrence: rise. 
+* Second occurrence: fall
+*/
+void echo_handler(void) {
+    TIMER0_ICR_R = (1 << 10);               // Clear the capture event flag
+
+    if (first_time_flag == 0) {
+        TIMER0_CTL_R  &= ~(1 << 8);         // Stop TIM0B (FIXME, timer needs to be turned on one time because otherwise the interrupt never fires)
+        first_time_flag = 1;
+    }
+
+    if (isr_counter == 0) {
+        TIMER0_CTL_R  |= (1 << 8);          // Start TIM0B
+        first_edge = TIMER0_TBR_R;          // Read TIM0B value (result is a raw timer count value)
+
+        isr_counter++;
+    } else if (isr_counter == 1) {
+        TIMER0_CTL_R  &= ~(1 << 8);         // Stop TIM0B
+        second_edge = TIMER0_TBR_R;         // Read TIM0B value (result is a raw timer count value)
+        
+        captured_time = first_edge - second_edge;
+        time_available_flag = 1;            // Flag main to calculate and log the value
+
+        isr_counter = 0;
+    }
+}
+
 /*******************************************************************************************/
 
 int main(void) {
@@ -356,21 +373,35 @@ int main(void) {
     printf("Application start! \r\n");
     sleep_ms(100);
 
-    uint32_t timer_count = 0;
     uint32_t distance_cm = 0;
     
     while(1) {
-        blink();
+        // blink();
 
-        /* // Use the ultrasonic sensor to read distances
-        timer_count = echo_read_time();
-        distance_cm = calculate_distance_cm(timer_count);
-        printf("Distance = %lu cm \r\n", distance_cm);
-        sleep_ms(1000);
-        */
+        trigger_ultrasonic();
+
+        if (time_available_flag) {
+            // Use the ultrasonic sensor to read distances
+            distance_cm = calculate_distance_cm(captured_time);
+            printf("Distance = %lu cm \r\n", distance_cm);
+
+            time_available_flag = 0;
+        }
+
+        sleep_ms(50);
 
         /* // Non-functional yet; needs a small tweak
         read_pendulum_control();
+        */
+
+        /*
+        * An improvement should be done over the current implementation to only read the first_edge and second_edge values when there're actually new values.
+        * Else I need to find a smarter place to restart the timers. Right now they are not restarting.
+        */
+
+        /*
+        * I can work on a variation that uses the __wfi() function, letting the controller sleep until an interrupt occurs.
+        * This implementation would make more sense if a button could be pressed to send the ultrasonic_trigger.
         */
     }
 }
