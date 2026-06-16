@@ -1,0 +1,4 @@
+... and create a subfolder FRM (if not there yet) 
+where the test bench places the video frames.
+
+Matlab script convertModelsimToMP4.m must be in FRM, too.
