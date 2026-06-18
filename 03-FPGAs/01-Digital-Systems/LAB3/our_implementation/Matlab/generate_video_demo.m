@@ -7,6 +7,8 @@
 %   - Luciano Carricart
 %   - Imran Rizwan
 %   - Georgii Molyboga
+% 
+% v2: frameWait fixed to 3 since the tolerances of the clock can be disregarded.
 %===============================================================================
 
 clear all;
@@ -39,7 +41,6 @@ X_MIN = 0;
 Y_MIN = 0;
 X_MAX = X_VISIBLE - STEP_WIDTH; % 775
 Y_MAX = Y_VISIBLE - STEP_WIDTH; % 575
-BLOCK_MOVE_RATE = 21;           % 21 block moves per second to meet the requirement
 
 % color definitions (R*256*256 + G*256 + B)
 COLOR_RED   = 255*256*256;
@@ -64,10 +65,9 @@ dirX = STEP_WIDTH;      % horizontal step per block move (decrements to the left
 dirY = -STEP_WIDTH;     % vertical step per block move   (decrements to the top)
 currColor = COLOR_BLUE; % color initialization
 
-% Variables to make the 21 Hz per move match the 72 Hz frame rate
+% Variables to slow the block move down from the 72 Hz frame rate
 frameCounter = 0;       % frames drawn since the last move
-moveNumber   = 1;       % tracks the move number (1 to 7)
-frameWait     = 3;       % frames to wait before the next move
+frameWait    = 3;       % frames to wait before the next move (72/3 = 24 moves/s)
 % -------------------------------------------------------------------------------
 tic
 for N = [1:VIDEO_LEN*FRAME_RATE] % number of frames to be generated (72fps @ 800x600)
@@ -105,22 +105,11 @@ for N = [1:VIDEO_LEN*FRAME_RATE] % number of frames to be generated (72fps @ 800
             % update square position after frame is complete
             % If the "cursor" is in the bottom-right of the active region
             if (xPos == X_VISIBLE) && (yPos == Y_VISIBLE)
-                % STATE: UPDATE_MOVE_CYCLE (frameWaits, moveCounter, frameCounter)
+                % STATE: UPDATE_MOVE_CYCLE (frameWait, frameCounter)
                 frameCounter = frameCounter + 1;
-                % If waited long enough, move a block (but first update the variables
+                % If waited long enough, move a block (but first update the variables)
                 if frameCounter >= frameWait
                     frameCounter = 0;
-                    moveNumber = moveNumber + 1;
-                    if moveNumber > 7
-                        moveNumber = 1;
-                    end
-                    % Set the next gap from the cycle: 3,3,4,3,4,3,4 frameWaits
-                    switch moveNumber
-                        case {1, 2, 4, 6}
-                            frameWait = 3;
-                        case {3, 5, 7}
-                            frameWait = 4;
-                    end
 
                     % STATE: UPDATE_POSITION (diagonal move and bounce logic)
                     bounced = 0;
