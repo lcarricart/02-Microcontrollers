@@ -92,6 +92,7 @@ char* receive_fake_sensor_packet(void);
  *=====================*/
 
 int main(void) {
+     ADC_SSCTL0_END1 = 
     char* sensor_packet;
     int result;
 
