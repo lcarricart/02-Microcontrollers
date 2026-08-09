@@ -1,7 +1,14 @@
 /*******************************************************************************************************************
- * Objective:  Solve the classic RTOS problem of the dining philosophers proposed by Dijsktra.
+ * Objective:  Recreate the classic RTOS problem of the dining philosophers proposed by Dijsktra.
  *******************************************************************************************************************
- * Remarks:
+ * Remarks: When looking at the output, since forks are shared between neighboring philosophers, those seating next
+ *          to each other cannot eat simultaneously. The idea of this exercise is to propose a solution that does
+ *          not lead to a deadlock situation, where everyone stays waiting forever:
+ *              - P1 owns fork1, waits fork2
+ *              - P2 owns fork2, waits fork3
+ *              - P3 owns fork3, waits fork4
+ *              - P4 owns fork4, waits fork5
+ *              - P5 owns fork5, waits fork1
  *******************************************************************************************************************
  * Conclusion:
  *******************************************************************************************************************
