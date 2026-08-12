@@ -520,3 +520,6 @@ modules/
 bootloader/
 tools/
 '@ | Set-Content -Encoding UTF8 "$APP_REPO\.gitignore"
+
+docs/
+_docs/
