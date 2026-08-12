@@ -1,0 +1,22 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Zephyr: Debug with LinkServer",
+            "type": "cortex-debug",
+            "request": "launch",
+            "servertype": "external",
+            "gdbTarget": "localhost:3333",
+
+            // This path allows the .vscode root folder to be located anywhere
+            "executable": "C:/Users/luchi/source/repos/lcarricart/02-Microcontrollers/04-NXP/02-frdm-mcxn947/02_zephyr_button_isr/build/zephyr/zephyr.elf",
+            "gdbPath": "C:/Users/luchi/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/arm-zephyr-eabi-gdb-py.exe",
+
+            "overrideLaunchCommands": [
+                "set mem inaccessible-by-default off",
+                "monitor reset",
+                "load"
+            ]
+        }
+    ]
+}

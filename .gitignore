@@ -17,7 +17,6 @@
 mono_crash.*
 
 # Build results
-[Dd]ebug/
 [Dd]ebugPublic/
 [Rr]elease/
 [Rr]eleases/
@@ -450,6 +449,7 @@ Thumbs.db
 RemoteSystemsTempFiles/
 
 # ========= Build output folders =========
+# Remember for the future that Debug and debug are the same :((
 Debug/
 Release/
 release/
@@ -522,3 +522,4 @@ tools/
 
 docs/
 _docs/
+
