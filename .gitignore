@@ -452,7 +452,6 @@ RemoteSystemsTempFiles/
 # ========= Build output folders =========
 Debug/
 Release/
-debug/
 release/
 build/
 out/
