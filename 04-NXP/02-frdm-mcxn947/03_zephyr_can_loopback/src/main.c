@@ -5,8 +5,13 @@
    Later whole-chain tests (no loopback) will involve the transceiver, the output interfaces, and the receival by the
    other node (where its own loopback test also makes sense before receiving the first frame).
  -------------------------------------------------------------------------------------------------------------------
- * Conclusions: If two ISRs could write the same variable, we would use atomic_t and safe modification API, rather
-   than volatile.
+ * Conclusions: 
+    - If two ISRs could write the same variable, we would use atomic_t and safe modification API, rather
+      than volatile.
+    - In order to see the output of printk(), open the Serial Monitor extension. This is because inside frdm_mcxn947_mcxn947_cpu0.dtsi
+      zephyr,console = &flexcomm4_lpuart4
+        - In frdm_mcxn947.dtsi I would find &flexcomm4_lpuart4 {current-speed = <115200>; ...} to know how to match the
+          Serial Monitor.
  -------------------------------------------------------------------------------------------------------------------
  * Author: Luciano Carricart, https://github.com/lcarricart/
  * Status: Information Engineering student, HAW Hamburg, Germany.
