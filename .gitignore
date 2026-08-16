@@ -522,5 +522,8 @@ tools/
 
 docs/
 _docs/
+__docs/
+
+RTD/
 
 generate/
