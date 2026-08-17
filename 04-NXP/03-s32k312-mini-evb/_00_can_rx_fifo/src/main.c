@@ -25,17 +25,57 @@
 #include "Port.h"
 #include "Dio.h"
 #include "Gpt.h"
+#include "FlexCAN_Ip.h"
 
-/* Prototypes */
+/*------------------------------------------------------------------------------------------------------------------
+ * Prototypes
+ *------------------------------------------------------------------------------------------------------------------*/
 void init(void);
 void DelayMs(uint32_t delayMs);
+void can_init(void);
+void can_loopback(void);
 
+/*------------------------------------------------------------------------------------------------------------------
+ * Variables
+ *------------------------------------------------------------------------------------------------------------------*/
+
+
+/*------------------------------------------------------------------------------------------------------------------
+ * CAN Variables
+ *------------------------------------------------------------------------------------------------------------------*/
+uint8 dummyData[8] = {0,2,3,4,5,6,7};
+Flexcan_Ip_MsgBuffType rxFrame = {0};
+uint8_t tx_errors, rx_errors = 0;
+
+Flexcan_Ip_DataInfoType tx_info =
+{
+	.msg_id_type = FLEXCAN_MSG_ID_STD,  // 11-bit ID
+	.data_length = 8u,                  // DLC=7
+	.fd_enable   = FALSE,               // classic CAN
+	.fd_padding  = FALSE,
+	.enable_brs  = FALSE,
+	.is_polling  = TRUE,                // works well with *SendBlocking*
+	.is_remote   = FALSE                // data frame (not RTR)
+};
+
+Flexcan_Ip_DataInfoType rx_info =
+{
+	.msg_id_type = FLEXCAN_MSG_ID_STD,
+	.data_length = 8u,
+	.is_polling = TRUE,
+	.is_remote = FALSE
+};
+
+Flexcan_Ip_StatusType rxStatus;
+Flexcan_Ip_StatusType txStatus;
+
+/*------------------------------------------------------------------------------------------------------------------
+ * Functions
+ *------------------------------------------------------------------------------------------------------------------*/
 int main(void)
 {
 	init();
 
-	DelayMs(5000);
-
 	Dio_WriteChannel(DioConf_DioChannel_dio_rgb_red, STD_LOW);
 	DelayMs(500);
 	Dio_WriteChannel(DioConf_DioChannel_dio_rgb_red, STD_HIGH);
@@ -44,6 +84,13 @@ int main(void)
 	Dio_WriteChannel(DioConf_DioChannel_dio_rgb_red, STD_LOW);
 	DelayMs(500);
 	Dio_WriteChannel(DioConf_DioChannel_dio_rgb_red, STD_HIGH);
+
+	while(1)
+	{
+#ifdef CAN_LOOPBACK
+		can_loopback();
+#endif
+	}
 }
 
 /* Initialization of core microcontroller drivers (Mcu, Port, Dio) */
@@ -70,6 +117,81 @@ void init(void)
 	/* Gpt driver init */
 	/* Using PIT1_CH0 in one-shot mode is the simplest for the DelayMs UC */
 	Gpt_Init(NULL_PTR);
+
+	/* FlexCAN driver init */
+	can_init();
+}
+
+void can_init(void)
+{
+#define RX_MB   (0U)
+#define TX_MB   (1U)
+	Flexcan_Ip_StatusType can_status = 0x01U; /* E_NOT_OK */
+	uint8_t init = 0, config = 0, start = 0;
+
+	/* I know from experience that checking the value of these variables in runtims is unreliable most of the times. Best is checking if an if is entered or not */
+
+	can_status = FlexCAN_Ip_Init(INST_FLEXCAN_0, &FlexCAN_State0, &FlexCAN_Config0);
+	if(can_status != FLEXCAN_STATUS_SUCCESS) {
+		init++;
+	}
+#ifdef CAN_LOOPBACK
+	can_status = FlexCAN_Ip_ConfigRxMb(INST_FLEXCAN_0, RX_MB, &rx_info, 0x123U); /* Acceptance mask, CAN MSG_ID configured for that RX message buffer */
+	if(can_status != FLEXCAN_STATUS_SUCCESS) {
+		config++;
+	}
+	can_status = FlexCAN_Ip_SetStartMode(INST_FLEXCAN_0);
+	if(can_status != FLEXCAN_STATUS_SUCCESS)
+	{
+		start++;
+	}
+
+	/* My best attempt to not get these important variables optimized out */
+	dummyData[0] = init + config + start;
+
+	/* Do not continue the program if any failed */
+#endif
+}
+
+void can_loopback(void)
+{
+	/* Arm the reception to message buffer RX_MB */
+	rxStatus = FlexCAN_Ip_Receive(INST_FLEXCAN_0, RX_MB, &rxFrame, TRUE /* polling */);
+	if (rxStatus != FLEXCAN_STATUS_SUCCESS)
+	{
+		rx_errors++;
+
+		DelayMs(500);
+		Dio_WriteChannel(DioConf_DioChannel_dio_rgb_red, STD_LOW);
+		DelayMs(500);
+		Dio_WriteChannel(DioConf_DioChannel_dio_rgb_red, STD_HIGH);
+	}
+
+	/* Transmit from message buffer TX_MB */
+	txStatus = FlexCAN_Ip_SendBlocking(INST_FLEXCAN_0, TX_MB, &tx_info, 0x123U, dummyData, 100u);
+	if (txStatus != FLEXCAN_STATUS_SUCCESS) {
+		tx_errors++;
+
+		DelayMs(500);
+		Dio_WriteChannel(DioConf_DioChannel_dio_rgb_red, STD_LOW);
+		DelayMs(500);
+		Dio_WriteChannel(DioConf_DioChannel_dio_rgb_red, STD_HIGH);
+	}
+
+	/* Poll RX until reception completes */
+    do
+    {
+        FlexCAN_Ip_MainFunctionRead(INST_FLEXCAN_0, RX_MB);
+        rxStatus = FlexCAN_Ip_GetTransferStatus(INST_FLEXCAN_0, RX_MB);
+    } while (rxStatus == FLEXCAN_STATUS_BUSY);
+    if (rxStatus != FLEXCAN_STATUS_SUCCESS) {
+    	rx_errors++;
+
+    	DelayMs(500);
+		Dio_WriteChannel(DioConf_DioChannel_dio_rgb_red, STD_LOW);
+		DelayMs(500);
+		Dio_WriteChannel(DioConf_DioChannel_dio_rgb_red, STD_HIGH);
+    }
 }
 
 /*------------------------------------------------------------------------------------------------------------------

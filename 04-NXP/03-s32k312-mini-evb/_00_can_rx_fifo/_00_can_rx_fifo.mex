@@ -54,26 +54,31 @@
                   <pin peripheral="SIUL2" signal="gpio, 85" pin_num="86" pin_signal="PTC21">
                      <pin_features>
                         <pin_feature name="direction" value="OUTPUT"/>
+                        <pin_feature name="InitValue" value="state_1"/>
                      </pin_features>
                   </pin>
                   <pin peripheral="SIUL2" signal="gpio, 84" pin_num="85" pin_signal="PTC20">
                      <pin_features>
                         <pin_feature name="direction" value="OUTPUT"/>
+                        <pin_feature name="InitValue" value="state_1"/>
                      </pin_features>
                   </pin>
                   <pin peripheral="SIUL2" signal="gpio, 29" pin_num="32" pin_signal="PTA29">
                      <pin_features>
                         <pin_feature name="direction" value="OUTPUT"/>
+                        <pin_feature name="InitValue" value="state_1"/>
                      </pin_features>
                   </pin>
                   <pin peripheral="SIUL2" signal="gpio, 30" pin_num="33" pin_signal="PTA30">
                      <pin_features>
                         <pin_feature name="direction" value="OUTPUT"/>
+                        <pin_feature name="InitValue" value="state_1"/>
                      </pin_features>
                   </pin>
                   <pin peripheral="SIUL2" signal="gpio, 31" pin_num="39" pin_signal="PTA31">
                      <pin_features>
                         <pin_feature name="direction" value="OUTPUT"/>
+                        <pin_feature name="InitValue" value="state_1"/>
                      </pin_features>
                   </pin>
                </pins>
@@ -354,6 +359,11 @@
                   <data type="Version">1.0.0</data>
                </feature>
             </dependency>
+            <dependency resourceType="Tool" resourceId="Clocks" description="The Clocks tool is required by the Peripherals tool, but it is disabled." problem_level="2" source="Peripherals">
+               <feature name="enabled" evaluation="equal">
+                  <data>true</data>
+               </feature>
+            </dependency>
          </dependencies>
          <generated_project_files>
             <file path="board/Siul2_Port_Ip_Cfg.c" update_enabled="true"/>
@@ -502,7 +512,7 @@
                               <setting name="Name" value="FlexCAN_Config0"/>
                               <setting name="max_num_mb" value="16"/>
                               <setting name="num_id_filters" value="FLEXCAN_RX_FIFO_ID_FILTERS_8"/>
-                              <setting name="is_rx_fifo_needed" value="true"/>
+                              <setting name="is_rx_fifo_needed" value="false"/>
                               <setting name="fd_enable" value="false"/>
                               <setting name="flexcanMode" value="FLEXCAN_LOOPBACK_MODE"/>
                               <struct name="FlexCANRamBlock" quick_selection="Default">
