@@ -86,15 +86,10 @@ Flexcan_Ip_StatusType rxStatus;
 Flexcan_Ip_StatusType txStatus;
 
 #ifdef CAN_LOOPBACK_FIFO
-/* The manual requires exactly one table element per configured FIFO filter */
+/* (not true) The manual requires exactly one table element per configured FIFO filter */
 const Flexcan_Ip_IdTableType filterTable[8] =
 {
     { .isExtendedFrame = FALSE, .isRemoteFrame = FALSE, .id = 0x123U },
-    { .isExtendedFrame = FALSE, .isRemoteFrame = FALSE, .id = 0x7FFU },
-    { .isExtendedFrame = FALSE, .isRemoteFrame = FALSE, .id = 0x7FFU },
-    { .isExtendedFrame = FALSE, .isRemoteFrame = FALSE, .id = 0x7FFU },
-    { .isExtendedFrame = FALSE, .isRemoteFrame = FALSE, .id = 0x7FFU },
-    { .isExtendedFrame = FALSE, .isRemoteFrame = FALSE, .id = 0x7FFU },
     { .isExtendedFrame = FALSE, .isRemoteFrame = FALSE, .id = 0x7FFU },
     { .isExtendedFrame = FALSE, .isRemoteFrame = FALSE, .id = 0x7FFU }
 };
