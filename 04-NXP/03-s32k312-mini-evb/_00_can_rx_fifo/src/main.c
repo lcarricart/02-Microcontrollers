@@ -8,6 +8,10 @@
  -------------------------------------------------------------------------------------------------------------------
  * Remarks: I spent a long time configuring the toolchain for this project, and the SDK for this board expects a
  * project configured for NXP GCC 10.2, extension that isn't default and needs to be installed.
+ *
+ * Possible configurations:
+ * 		- CAN_LOOPBACK_SIMPLE: internal loopback mode with regular buffer
+ * 		- CAN_LOOPBACK_FIFO: internal loopback mode with legacy rxFIFO
  -------------------------------------------------------------------------------------------------------------------
  * Conclusions:
  -------------------------------------------------------------------------------------------------------------------
@@ -30,10 +34,19 @@
 /*------------------------------------------------------------------------------------------------------------------
  * Prototypes
  *------------------------------------------------------------------------------------------------------------------*/
-void init(void);
+void initialization(void);
 void DelayMs(uint32_t delayMs);
 void can_init(void);
-void can_loopback(void);
+
+#ifdef CAN_LOOPBACK_SIMPLE
+void can_init_simple(void);
+void can_loopback_simple(void);
+#endif
+
+#ifdef CAN_LOOPBACK_FIFO
+void can_init_loopback_fifo(void);
+void can_loopback_fifo(void);
+#endif
 
 /*------------------------------------------------------------------------------------------------------------------
  * Variables
@@ -43,9 +56,12 @@ void can_loopback(void);
 /*------------------------------------------------------------------------------------------------------------------
  * CAN Variables
  *------------------------------------------------------------------------------------------------------------------*/
-uint8 dummyData[8] = {0,2,3,4,5,6,7};
+uint8 dummyData[8] = {0,1,2,3,4,5,6,7};
 Flexcan_Ip_MsgBuffType rxFrame = {0};
-uint8_t tx_errors, rx_errors = 0;
+
+Flexcan_Ip_StatusType can_status = 0x01U; /* E_NOT_OK */
+uint8_t init = 0, config = 0, start = 0;
+uint8_t tx_errors = 0, rx_errors = 0;
 
 Flexcan_Ip_DataInfoType tx_info =
 {
@@ -69,12 +85,29 @@ Flexcan_Ip_DataInfoType rx_info =
 Flexcan_Ip_StatusType rxStatus;
 Flexcan_Ip_StatusType txStatus;
 
+#ifdef CAN_LOOPBACK_FIFO
+/* The manual requires exactly one table element per configured FIFO filter */
+const Flexcan_Ip_IdTableType filterTable[8] =
+{
+    { .isExtendedFrame = FALSE, .isRemoteFrame = FALSE, .id = 0x123U },
+    { .isExtendedFrame = FALSE, .isRemoteFrame = FALSE, .id = 0x7FFU },
+    { .isExtendedFrame = FALSE, .isRemoteFrame = FALSE, .id = 0x7FFU },
+    { .isExtendedFrame = FALSE, .isRemoteFrame = FALSE, .id = 0x7FFU },
+    { .isExtendedFrame = FALSE, .isRemoteFrame = FALSE, .id = 0x7FFU },
+    { .isExtendedFrame = FALSE, .isRemoteFrame = FALSE, .id = 0x7FFU },
+    { .isExtendedFrame = FALSE, .isRemoteFrame = FALSE, .id = 0x7FFU },
+    { .isExtendedFrame = FALSE, .isRemoteFrame = FALSE, .id = 0x7FFU }
+};
+
+
+#endif
+
 /*------------------------------------------------------------------------------------------------------------------
  * Functions
  *------------------------------------------------------------------------------------------------------------------*/
 int main(void)
 {
-	init();
+	initialization();
 
 	Dio_WriteChannel(DioConf_DioChannel_dio_rgb_red, STD_LOW);
 	DelayMs(500);
@@ -87,14 +120,17 @@ int main(void)
 
 	while(1)
 	{
-#ifdef CAN_LOOPBACK
-		can_loopback();
+#ifdef CAN_LOOPBACK_SIMPLE
+		can_loopback_simple();
+#endif
+#ifdef CAN_LOOPBACK_FIFO
+		can_loopback_fifo();
 #endif
 	}
 }
 
 /* Initialization of core microcontroller drivers (Mcu, Port, Dio) */
-void init(void)
+void initialization(void)
 {
 	/* Mcu driver init (may include PLL and other calls if applicable) */
 	Mcu_Init(NULL_PTR);
@@ -124,18 +160,30 @@ void init(void)
 
 void can_init(void)
 {
-#define RX_MB   (0U)
-#define TX_MB   (1U)
-	Flexcan_Ip_StatusType can_status = 0x01U; /* E_NOT_OK */
-	uint8_t init = 0, config = 0, start = 0;
-
 	/* I know from experience that checking the value of these variables in runtims is unreliable most of the times. Best is checking if an if is entered or not */
-
 	can_status = FlexCAN_Ip_Init(INST_FLEXCAN_0, &FlexCAN_State0, &FlexCAN_Config0);
 	if(can_status != FLEXCAN_STATUS_SUCCESS) {
 		init++;
 	}
-#ifdef CAN_LOOPBACK
+#ifdef CAN_LOOPBACK_SIMPLE
+#define RX_MB   (0U)
+#define TX_MB   (1U)
+	can_init_loopback_simple();
+#endif
+
+#ifdef CAN_LOOPBACK_FIFO
+#define RX_MB   (0U)
+
+/* Because of rxFIFO filter numbers; if 8 configure, 0-7 are used, and minimum accessible is 8
+ * It is important to have the max number of MB also correct. If set to 8 and rxFIFO has also 8 filter IDs, then not sufficient */
+#define TX_MB   (8U)
+	can_init_loopback_fifo();
+#endif
+}
+
+#ifdef CAN_LOOPBACK_SIMPLE
+void can_init_loopback_simple(void)
+{
 	can_status = FlexCAN_Ip_ConfigRxMb(INST_FLEXCAN_0, RX_MB, &rx_info, 0x123U); /* Acceptance mask, CAN MSG_ID configured for that RX message buffer */
 	if(can_status != FLEXCAN_STATUS_SUCCESS) {
 		config++;
@@ -150,10 +198,9 @@ void can_init(void)
 	dummyData[0] = init + config + start;
 
 	/* Do not continue the program if any failed */
-#endif
 }
 
-void can_loopback(void)
+void can_loopback_simple(void)
 {
 	/* Arm the reception to message buffer RX_MB */
 	rxStatus = FlexCAN_Ip_Receive(INST_FLEXCAN_0, RX_MB, &rxFrame, TRUE /* polling */);
@@ -184,15 +231,46 @@ void can_loopback(void)
         FlexCAN_Ip_MainFunctionRead(INST_FLEXCAN_0, RX_MB);
         rxStatus = FlexCAN_Ip_GetTransferStatus(INST_FLEXCAN_0, RX_MB);
     } while (rxStatus == FLEXCAN_STATUS_BUSY);
-    if (rxStatus != FLEXCAN_STATUS_SUCCESS) {
-    	rx_errors++;
-
-    	DelayMs(500);
-		Dio_WriteChannel(DioConf_DioChannel_dio_rgb_red, STD_LOW);
-		DelayMs(500);
-		Dio_WriteChannel(DioConf_DioChannel_dio_rgb_red, STD_HIGH);
-    }
 }
+#endif
+
+#ifdef CAN_LOOPBACK_FIFO
+void can_init_loopback_fifo(void)
+{
+	can_status = FlexCAN_Ip_ConfigRxFifo(INST_FLEXCAN_0, FLEXCAN_RX_FIFO_ID_FORMAT_A /* standard */, filterTable);
+	if(can_status != FLEXCAN_STATUS_SUCCESS)
+	{
+		config++;
+	}
+
+	can_status = FlexCAN_Ip_SetStartMode(INST_FLEXCAN_0);
+	if(can_status != FLEXCAN_STATUS_SUCCESS)
+	{
+		start++;
+	}
+}
+
+void can_loopback_fifo(void)
+{
+    rxStatus = FlexCAN_Ip_RxFifo(INST_FLEXCAN_0, &rxFrame);
+    if (rxStatus != FLEXCAN_STATUS_SUCCESS)
+    {
+        rx_errors++;
+    }
+
+    txStatus = FlexCAN_Ip_SendBlocking(INST_FLEXCAN_0, TX_MB, &tx_info, 0x123U, dummyData, 100U);
+    if (txStatus != FLEXCAN_STATUS_SUCCESS)
+    {
+        tx_errors++;
+    }
+
+    do
+    {
+        FlexCAN_Ip_MainFunctionRead(INST_FLEXCAN_0, 0U);
+        rxStatus = FlexCAN_Ip_GetTransferStatus(INST_FLEXCAN_0, 0U);
+    } while (rxStatus == FLEXCAN_STATUS_BUSY);
+}
+#endif
 
 /*------------------------------------------------------------------------------------------------------------------
  * Aux Functions
