@@ -39,13 +39,23 @@ void DelayMs(uint32_t delayMs);
 void can_init(void);
 
 #ifdef CAN_LOOPBACK_SIMPLE
-void can_init_simple(void);
+void can_init_loopback_simple(void);
 void can_loopback_simple(void);
 #endif
 
 #ifdef CAN_LOOPBACK_FIFO
 void can_init_loopback_fifo(void);
 void can_loopback_fifo(void);
+#endif
+
+#ifdef CAN_SIMPLE
+void can_init_simple(void);
+void can_simple(void);
+#endif
+
+#ifdef CAN_FIFO
+void can_init_fifo(void);
+void can_fifo(void);
 #endif
 
 /*------------------------------------------------------------------------------------------------------------------
@@ -121,6 +131,12 @@ int main(void)
 #ifdef CAN_LOOPBACK_FIFO
 		can_loopback_fifo();
 #endif
+#ifdef CAN_SIMPLE
+		can_simple();
+#endif
+#ifdef CAN_FIFO
+		can_fifo();
+#endif
 	}
 }
 
@@ -173,6 +189,14 @@ void can_init(void)
  * It is important to have the max number of MB also correct. If set to 8 and rxFIFO has also 8 filter IDs, then not sufficient */
 #define TX_MB   (8U)
 	can_init_loopback_fifo();
+#endif
+
+#ifdef CAN_SIMPLE
+	can_init_simple();
+#endif
+
+#ifdef CAN_FIFO
+	can_fifo();
 #endif
 }
 
@@ -267,6 +291,29 @@ void can_loopback_fifo(void)
 }
 #endif
 
+#ifdef CAN_SIMPLE
+void can_init_simple(void)
+{
+
+}
+
+void can_simple(void)
+{
+
+}
+#endif
+
+#ifdef CAN_FIFO
+void can_init_fifo(void)
+{
+
+}
+
+void can_fifo(void)
+{
+
+}
+#endif
 /*------------------------------------------------------------------------------------------------------------------
  * Aux Functions
  *------------------------------------------------------------------------------------------------------------------*/
