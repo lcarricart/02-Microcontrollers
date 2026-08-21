@@ -54,7 +54,7 @@
 									<listOptionValue builtIn="false" value="GCC"/>
 									<listOptionValue builtIn="false" value="CPU_S32K312"/>
 									<listOptionValue builtIn="false" value="CPU_CORTEX_M7"/>
-									<listOptionValue builtIn="false" value="CAN_LOOPBACK_SIMPLE"/>
+									<listOptionValue builtIn="false" value="CAN_SIMPLE_RECEIVER"/>
 								</option>
 								<option id="com.nxp.s32ds.cle.arm.mbs.arm32.bare.tool.c.compiler.option.target.instructionset.476980120" name="Instruction set" superClass="com.nxp.s32ds.cle.arm.mbs.arm32.bare.tool.c.compiler.option.target.instructionset" useByScannerDiscovery="true" value="com.nxp.s32ds.cle.arm.mbs.arm32.bare.tool.c.compiler.option.target.instructionset.thumb" valueType="enumerated"/>
 								<option id="com.nxp.s32ds.cle.arm.mbs.arm32.bare.tool.c.compiler.option.target.sysroot.966567486" name="Sysroot" superClass="com.nxp.s32ds.cle.arm.mbs.arm32.bare.tool.c.compiler.option.target.sysroot" useByScannerDiscovery="false" value="--sysroot=&quot;${S32DS_K3_ARM32_GNU_10_2_TOOLCHAIN_DIR}/arm-none-eabi/lib&quot;" valueType="string"/>

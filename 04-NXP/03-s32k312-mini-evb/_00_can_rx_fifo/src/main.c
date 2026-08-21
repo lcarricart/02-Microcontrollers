@@ -3,15 +3,16 @@
  * a node to node system, and the CAN Sender project can be found in FRDM-MCXN947/ running Zephyr.
  *
  * Future stages of this project involve
- * 		- Testing a DelayMs function using a PIT instance
  * 		- Interrupts integration using the AUTOSAR Platform driver.
  -------------------------------------------------------------------------------------------------------------------
- * Remarks: I spent a long time configuring the toolchain for this project, and the SDK for this board expects a
- * project configured for NXP GCC 10.2, extension that isn't default and needs to be installed.
+ * Remarks: both boards include termination resistors in their CAN interfaces. Awesome!
  *
  * Possible configurations:
+ * (In order to change between them, both ConfigTools and macros need to be adjusted)
  * 		- CAN_LOOPBACK_SIMPLE: internal loopback mode with regular buffer
  * 		- CAN_LOOPBACK_FIFO: internal loopback mode with legacy rxFIFO
+ * 		- CAN_SIMPLE_RECEIVER: normal mode using with regular buffer (only receive)
+ * 		- CAN_FIFO_RECEIVER: normal mode with legacy rxFIFO (only receive)
  -------------------------------------------------------------------------------------------------------------------
  * Conclusions:
  -------------------------------------------------------------------------------------------------------------------
@@ -48,20 +49,20 @@ void can_init_loopback_fifo(void);
 void can_loopback_fifo(void);
 #endif
 
-#ifdef CAN_SIMPLE
-void can_init_simple(void);
-void can_simple(void);
+#ifdef CAN_SIMPLE_RECEIVER
+void can_init_simple_receiver(void);
+void can_simple_receiver(void);
 #endif
 
-#ifdef CAN_FIFO
-void can_init_fifo(void);
-void can_fifo(void);
+#ifdef CAN_FIFO_RECEIVER
+void can_init_fifo_receiver(void);
+void can_fifo_receiver(void);
 #endif
 
 /*------------------------------------------------------------------------------------------------------------------
  * Variables
  *------------------------------------------------------------------------------------------------------------------*/
-
+uint8_t led_green_state = STD_HIGH;
 
 /*------------------------------------------------------------------------------------------------------------------
  * CAN Variables
@@ -72,11 +73,12 @@ Flexcan_Ip_MsgBuffType rxFrame = {0};
 Flexcan_Ip_StatusType can_status = 0x01U; /* E_NOT_OK */
 uint8_t init = 0, config = 0, start = 0;
 uint8_t tx_errors = 0, rx_errors = 0;
+uint16_t received_frames = 0;
 
 Flexcan_Ip_DataInfoType tx_info =
 {
 	.msg_id_type = FLEXCAN_MSG_ID_STD,  // 11-bit ID
-	.data_length = 8u,                  // DLC=7
+	.data_length = 8u,
 	.fd_enable   = FALSE,               // classic CAN
 	.fd_padding  = FALSE,
 	.enable_brs  = FALSE,
@@ -131,11 +133,11 @@ int main(void)
 #ifdef CAN_LOOPBACK_FIFO
 		can_loopback_fifo();
 #endif
-#ifdef CAN_SIMPLE
-		can_simple();
+#ifdef CAN_SIMPLE_RECEIVER
+		can_simple_receiver();
 #endif
-#ifdef CAN_FIFO
-		can_fifo();
+#ifdef CAN_FIFO_RECEIVER
+		can_fifo_receiver();
 #endif
 	}
 }
@@ -191,12 +193,13 @@ void can_init(void)
 	can_init_loopback_fifo();
 #endif
 
-#ifdef CAN_SIMPLE
-	can_init_simple();
+#ifdef CAN_SIMPLE_RECEIVER
+#define RX_MB   (0U)
+	can_init_simple_receiver();
 #endif
 
-#ifdef CAN_FIFO
-	can_fifo();
+#ifdef CAN_FIFO_RECEIVER
+	can_init_fifo_receiver();
 #endif
 }
 
@@ -291,25 +294,63 @@ void can_loopback_fifo(void)
 }
 #endif
 
-#ifdef CAN_SIMPLE
-void can_init_simple(void)
+#ifdef CAN_SIMPLE_RECEIVER
+void can_init_simple_receiver(void)
 {
+	/* Configuration of the MessageBuffer receive ID for that RX MB */
+	can_status = FlexCAN_Ip_ConfigRxMb(INST_FLEXCAN_0, RX_MB, &rx_info, 0x123U);
+	if(can_status != FLEXCAN_STATUS_SUCCESS) {
+		config++;
+	}
+	can_status = FlexCAN_Ip_SetStartMode(INST_FLEXCAN_0);
+	if(can_status != FLEXCAN_STATUS_SUCCESS)
+	{
+		start++;
+	}
 
+	/* My best attempt to not get these important variables optimized out */
+	dummyData[0] = init + config + start;
+
+	/* Verify that the steps where executed successfully */
 }
 
-void can_simple(void)
+void can_simple_receiver(void)
 {
+	/* Arm the reception to message buffer RX_MB */
+	rxStatus = FlexCAN_Ip_Receive(INST_FLEXCAN_0, RX_MB, &rxFrame, TRUE);
+	if (rxStatus != FLEXCAN_STATUS_SUCCESS)
+	{
+		rx_errors++;
 
+		DelayMs(500);
+		Dio_WriteChannel(DioConf_DioChannel_dio_rgb_red, STD_LOW);
+		DelayMs(500);
+		Dio_WriteChannel(DioConf_DioChannel_dio_rgb_red, STD_HIGH);
+	}
+
+	/* Poll RX until reception completes */
+	do
+	{
+		FlexCAN_Ip_MainFunctionRead(INST_FLEXCAN_0, RX_MB);
+		rxStatus = FlexCAN_Ip_GetTransferStatus(INST_FLEXCAN_0, RX_MB);
+
+		if (rxStatus == FLEXCAN_STATUS_SUCCESS)
+		{
+			received_frames++;
+			led_green_state ^= 0x01; /* toggle LED */
+			Dio_WriteChannel(DioConf_DioChannel_dio_rgb_green, led_green_state);
+		}
+	} while (rxStatus == FLEXCAN_STATUS_BUSY);
 }
 #endif
 
-#ifdef CAN_FIFO
-void can_init_fifo(void)
+#ifdef CAN_FIFO_RECEIVER
+void can_init_fifo_receiver(void)
 {
 
 }
 
-void can_fifo(void)
+void can_fifo_receiver(void)
 {
 
 }
