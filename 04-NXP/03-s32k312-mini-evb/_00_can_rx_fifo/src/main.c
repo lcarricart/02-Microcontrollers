@@ -32,6 +32,8 @@
 #include "Gpt.h"
 #include "FlexCAN_Ip.h"
 
+#include "assert.h"
+
 /*------------------------------------------------------------------------------------------------------------------
  * Prototypes
  *------------------------------------------------------------------------------------------------------------------*/
@@ -63,6 +65,7 @@ void can_fifo_receiver(void);
  * Variables
  *------------------------------------------------------------------------------------------------------------------*/
 uint8_t led_green_state = STD_HIGH;
+uint8_t led_red_state = STD_HIGH;
 
 /*------------------------------------------------------------------------------------------------------------------
  * CAN Variables
@@ -97,7 +100,7 @@ Flexcan_Ip_DataInfoType rx_info =
 Flexcan_Ip_StatusType rxStatus;
 Flexcan_Ip_StatusType txStatus;
 
-#ifdef CAN_LOOPBACK_FIFO
+#if defined(CAN_LOOPBACK_FIFO) || defined(CAN_FIFO_RECEIVER)
 /* (not true) The manual requires exactly one table element per configured FIFO filter */
 const Flexcan_Ip_IdTableType filterTable[8] =
 {
@@ -199,6 +202,7 @@ void can_init(void)
 #endif
 
 #ifdef CAN_FIFO_RECEIVER
+#define RX_MB   (0U)
 	can_init_fifo_receiver();
 #endif
 }
@@ -216,10 +220,7 @@ void can_init_loopback_simple(void)
 		start++;
 	}
 
-	/* My best attempt to not get these important variables optimized out */
-	dummyData[0] = init + config + start;
-
-	/* Do not continue the program if any failed */
+	DevAssert((init + config + start) == 0);
 }
 
 void can_loopback_simple(void)
@@ -270,6 +271,8 @@ void can_init_loopback_fifo(void)
 	{
 		start++;
 	}
+
+	DevAssert((init + config + start) == 0);
 }
 
 void can_loopback_fifo(void)
@@ -308,10 +311,7 @@ void can_init_simple_receiver(void)
 		start++;
 	}
 
-	/* My best attempt to not get these important variables optimized out */
-	dummyData[0] = init + config + start;
-
-	/* Verify that the steps where executed successfully */
+	DevAssert((init + config + start) == 0);
 }
 
 void can_simple_receiver(void)
@@ -347,12 +347,40 @@ void can_simple_receiver(void)
 #ifdef CAN_FIFO_RECEIVER
 void can_init_fifo_receiver(void)
 {
+	can_status = FlexCAN_Ip_ConfigRxFifo(INST_FLEXCAN_0, FLEXCAN_RX_FIFO_ID_FORMAT_A /* standard */, filterTable);
+	if(can_status != FLEXCAN_STATUS_SUCCESS)
+	{
+		config++;
+	}
 
+	can_status = FlexCAN_Ip_SetStartMode(INST_FLEXCAN_0);
+	if(can_status != FLEXCAN_STATUS_SUCCESS)
+	{
+		start++;
+	}
+
+	DevAssert((init + config + start) == 0);
 }
 
 void can_fifo_receiver(void)
 {
+	rxStatus = FlexCAN_Ip_RxFifo(INST_FLEXCAN_0, &rxFrame);
+	if ((rxStatus != FLEXCAN_STATUS_SUCCESS) && (rxStatus != FLEXCAN_STATUS_BUSY))
+	{
+		rx_errors++;
+		led_red_state ^= 0x01; /* toggle LED */
+		Dio_WriteChannel(DioConf_DioChannel_dio_rgb_red, led_red_state);
+	}
 
+	FlexCAN_Ip_MainFunctionRead(INST_FLEXCAN_0, 0U);
+	rxStatus = FlexCAN_Ip_GetTransferStatus(INST_FLEXCAN_0, 0U);
+
+	if (rxStatus == FLEXCAN_STATUS_SUCCESS)
+	{
+		received_frames++;
+		led_green_state ^= 0x01; /* toggle LED */
+		Dio_WriteChannel(DioConf_DioChannel_dio_rgb_green, led_green_state);
+	}
 }
 #endif
 /*------------------------------------------------------------------------------------------------------------------
@@ -360,7 +388,7 @@ void can_fifo_receiver(void)
  *------------------------------------------------------------------------------------------------------------------*/
 void DelayMs(uint32_t delayMs)
 {
-#define GPT_CHANNEL_TICK_FREQUENCY (30000000) /* Defined in GUI but not as a variable */
+#define GPT_CHANNEL_TICK_FREQUENCY (30000000) /* Defined in GUI but not as a variable (tho I think I can instruct ConfigTools to create variables of these (via "Preferences") */
 #define DELAY_GPT_CHANNEL (0u) /* PIT1 CH0 */
 
 	Gpt_ValueType timeoutTicks = ((uint64_t)delayMs * GPT_CHANNEL_TICK_FREQUENCY) / 1000ULL;

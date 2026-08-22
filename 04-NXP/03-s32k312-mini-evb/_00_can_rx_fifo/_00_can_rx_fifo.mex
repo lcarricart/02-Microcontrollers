@@ -512,7 +512,7 @@
                               <setting name="Name" value="FlexCAN_Config0"/>
                               <setting name="max_num_mb" value="16"/>
                               <setting name="num_id_filters" value="FLEXCAN_RX_FIFO_ID_FILTERS_8"/>
-                              <setting name="is_rx_fifo_needed" value="false"/>
+                              <setting name="is_rx_fifo_needed" value="true"/>
                               <setting name="fd_enable" value="false"/>
                               <setting name="flexcanMode" value="FLEXCAN_NORMAL_MODE"/>
                               <struct name="FlexCANRamBlock" quick_selection="Default">
